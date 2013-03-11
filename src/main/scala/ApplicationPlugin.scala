@@ -10,11 +10,11 @@ object ApplicationPlugin extends Plugin {
   val distAppTask = TaskKey[Unit]("dist-zip")
 
   val buffer = new StringBuffer
-  val suffix_r = "[\\d]\\.jar".r.pattern //x.x.x.jar pattern
+  val pattern = "^.*\\.jar$".r.pattern //x.x.x.jar pattern
 
 
   val applicationSettings = Seq(
-    dirSetting := Map("conf" -> "conf", "lib" -> "lib", "bin" -> "."),
+    dirSetting := Map("conf" -> "conf", "lib" -> "lib", "bin" -> ""),
     fileSetting := "dist",
 
     copyDependenciesTask <<= (update, crossTarget) map {
@@ -36,7 +36,7 @@ object ApplicationPlugin extends Plugin {
             all ++= Traversable((file, "lib/%s".format(file.getName)))
         }
         //package jar
-        val pattern = "^.*\\.jar$".r.pattern
+
         out.listFiles.filter(p => pattern.matcher(p.name).find()).foreach {
           file =>
             all ++= Traversable((file, "lib/%s".format(file.getName)))
@@ -44,14 +44,14 @@ object ApplicationPlugin extends Plugin {
 
         ds.foreach {
           it =>
-            println("@" + it._1 + "|" + it._2)
-            val path = new File(it._2)
+            val path = new File(it._1)
             if (path.exists()) path.listFiles.foreach {
-              file => all ++= Traversable((file, "%s/%s".format(it._1, file.getName)))
+              file =>
+                val path = if (it._2.length > 0) "%s/%s".format(it._2, file.getName) else "%s".format(file.getName)
+                all ++= Traversable((file, path))
             }
         }
         IO.zip(all, (out / "%s.zip".format(fs)))
     }
-
   )
 }
