@@ -27,40 +27,30 @@ object ApplicationPlugin extends Plugin {
         }
     }
     ,
-    distAppTask <<= (update, crossTarget, packageBin in Runtime) map {
-      (updateReport, out, _) =>
+    distAppTask <<= (update, crossTarget, packageBin in Runtime, dirSetting, fileSetting) map {
+      (updateReport, out, _, ds, fs) =>
         var all = Traversable[(File, String)]()
         //dependencies jar
         updateReport.select(Set("compile", "runtime")).foreach {
           file =>
-            val jar = Traversable((file, "lib/%s".format(file.getName)))
-            all ++= jar
+            all ++= Traversable((file, "lib/%s".format(file.getName)))
         }
         //package jar
         val pattern = "^.*\\.jar$".r.pattern
         out.listFiles.filter(p => pattern.matcher(p.name).find()).foreach {
           file =>
-            val jar = Traversable((file, "lib/%s".format(file.getName)))
-            all ++= jar
+            all ++= Traversable((file, "lib/%s".format(file.getName)))
         }
 
-        dirSetting map {
-          p =>
-            p.foreach {
-              it =>
-                val path = new File(it._2)
-                if (path.exists()) {
-                  path.listFiles.foreach {
-                    file =>
-                      val rfile = Traversable((file, "%s/%s".format(it._1, file.getName)))
-                      all ++= rfile
-                  }
-                }
+        ds.foreach {
+          it =>
+            println("@" + it._1 + "|" + it._2)
+            val path = new File(it._2)
+            if (path.exists()) path.listFiles.foreach {
+              file => all ++= Traversable((file, "%s/%s".format(it._1, file.getName)))
             }
         }
-        fileSetting map {
-          file => IO.zip(all, (out / "%s.zip".format(file)))
-        }
+        IO.zip(all, (out / "%s.zip".format(fs)))
     }
 
   )
