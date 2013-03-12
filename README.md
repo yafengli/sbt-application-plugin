@@ -5,9 +5,9 @@ Sbt Application Plugin
 ## 安装
 
 `
-git clone git@github.com:yafengli/sbt-application-plugin.git<br/>  
-cd sbt-application-plugin</br>
-sbt publish-local<br/>
+>git clone git@github.com:yafengli/sbt-application-plugin.git
+>cd sbt-application-plugin
+>sbt publish-local
 `
 
 ## 使用
@@ -30,5 +30,5 @@ dirSetting  打包包含文件路径Map，key为包含的目录，value为打包
 ## 命令
 
 `
-sbt dist-zip<br/>
+>sbt dist-zip
 `
