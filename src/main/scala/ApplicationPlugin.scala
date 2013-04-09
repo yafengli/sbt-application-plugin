@@ -47,8 +47,6 @@ object ApplicationPlugin extends Plugin {
             copy(new File(it._1), it._2, buffers)
         }
 
-        buffers.foreach(it => println(it._2))
-
         IO.zip(buffers, (out / "%s.zip".format(fs)))
     }
   )
