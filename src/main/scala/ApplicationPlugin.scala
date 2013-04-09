@@ -1,5 +1,6 @@
 import sbt._
 import Keys._
+import scala.collection.mutable.ArrayBuffer
 
 object ApplicationPlugin extends Plugin {
   //dir settings copy files from key to value.
@@ -29,29 +30,37 @@ object ApplicationPlugin extends Plugin {
     ,
     distAppTask <<= (update, crossTarget, packageBin in Runtime, dirSetting, fileSetting) map {
       (updateReport, out, _, ds, fs) =>
-        var all = Traversable[(File, String)]()
+
+        val buffers = ArrayBuffer[(File, String)]()
         //dependencies jar
         updateReport.select(Set("compile", "runtime")).foreach {
           file =>
-            all ++= Traversable((file, "lib/%s".format(file.getName)))
+            buffers += ((file, "lib/%s".format(file.getName)))
         }
         //package jar
-
         out.listFiles.filter(p => pattern.matcher(p.name).find()).foreach {
           file =>
-            all ++= Traversable((file, "lib/%s".format(file.getName)))
+            buffers += ((file, "lib/%s".format(file.getName)))
         }
-
         ds.foreach {
           it =>
-            val path = new File(it._1)
-            if (path.exists()) path.listFiles.foreach {
-              file =>
-                val path = if (it._2.length > 0) "%s/%s".format(it._2, file.getName) else "%s".format(file.getName)
-                all ++= Traversable((file, path))
-            }
+            copy(new File(it._1), it._2, buffers)
         }
-        IO.zip(all, (out / "%s.zip".format(fs)))
+
+        buffers.foreach(it => println(it._2))
+
+        IO.zip(buffers, (out / "%s.zip".format(fs)))
     }
   )
+
+  def copy(file: File, prefix: String, buffers: ArrayBuffer[(File, String)]) {
+    if (file.exists()) {
+      file.listFiles().foreach {
+        it =>
+          val path = if (prefix.trim.length > 0) "%s/%s".format(prefix, it.name) else it.name
+          if (it.isFile) buffers += ((it, path))
+          else if (it.isDirectory) copy(it, path, buffers)
+      }
+    }
+  }
 }
