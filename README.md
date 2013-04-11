@@ -20,7 +20,7 @@ Sbt Application Plugin
         		fileSetting := "test", 
         		dirSetting ++= Map("ext" -> "ext_dir")
     	)
-`dirSetting`*缺省*`Map("conf" -> "conf", "bin" -> "","lib" -> "lib")`
+`dirSetting`**缺省**`Map("conf" -> "conf", "bin" -> "","lib" -> "lib")`
 
 ## 配置
 * fileSetting 打包文件名；
