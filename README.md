@@ -13,12 +13,14 @@ Sbt Application Plugin
 
         addSbtPlugin("com.greatbit" %% "sbt-application-plugin" % "1.0.0")
 在project/Build.scala中添加类似内容:
-
+        
+        import ApplicationPlugin._
     	lazy val akkatest = 
-			Project(id = "test") settings(ApplicationPlugin.applicationSettings : _*) settings(
-        		ApplicationPlugin.fileSetting := "test", 
-        		ApplicationPlugin.dirSetting := Map("conf" -> "conf", "bin" -> "","lib" -> "lib")
+			Project(id = "test") settings(applicationSettings : _*) settings(
+        		fileSetting := "test", 
+        		dirSetting ++= Map("ext" -> "ext_dir")
     	)
+`dirSetting`*缺省*`Map("conf" -> "conf", "bin" -> "","lib" -> "lib")`
 
 ## 配置
 * fileSetting 打包文件名；
