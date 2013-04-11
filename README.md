@@ -23,8 +23,8 @@ Sbt Application Plugin
 `dirSetting`**缺省**`Map("conf" -> "conf", "bin" -> "","lib" -> "lib")`
 
 ## 配置
-* fileSetting 打包文件名；
-* dirSetting  打包包含文件路径Map，key为包含的目录，value为打包文件的目录；
+* `fileSetting` 打包文件名；
+* `dirSetting`  打包包含文件路径Map，key为包含的目录，value为打包文件的目录；
 
 ## 命令
         sbt dist-zip
