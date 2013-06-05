@@ -1,9 +1,30 @@
 Sbt Application Plugin
 ===========
 
+## 简介
+`Sbt Application Plugin`是`SBT`构建工具的一个插件，主要目标是为简单的应用打包，项目目录类似：
+
+        ├───bin                         //执行脚本
+        ├───conf                        //应用配置
+        ├───project                     //sbt配置
+        ├───src                         //源文件目录
+        │   ├───main
+        │   │   ├───java
+        │   │   ├───resources
+        │   │   └───scala   
+        │   └───test
+        │       ├───java
+        │       └───scala
+        └───target
+
+打包后的应用目录结构类似：
+
+        ├───*.sh    //bin目录下的执行脚本
+        ├───conf    //conf目录下的配置
+        ├───lib     //所有依赖的库(jar)
+
 
 ## 安装
-        git clone git@github.com:yafengli/sbt-application-plugin.git
         cd sbt-application-plugin
         sbt publish-local
 
