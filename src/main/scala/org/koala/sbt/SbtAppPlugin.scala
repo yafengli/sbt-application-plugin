@@ -1,11 +1,13 @@
+package org.koala.sbt
+
 import sbt._
 import Keys._
 import scala.collection.mutable.ArrayBuffer
 
-object ApplicationPlugin extends Plugin {
+object SbtAppPlugin extends Plugin {
   //dir settings copy files from key to value.
   val dirSetting = SettingKey[Map[String, String]]("dir-setting")
-  val fileSetting = SettingKey[String]("file-setting")
+  val prefix = SettingKey[String]("file-setting")
 
   val copyDependenciesTask = TaskKey[Unit]("copy-dependencies")
   val distAppTask = TaskKey[Unit]("dist-zip")
@@ -14,9 +16,9 @@ object ApplicationPlugin extends Plugin {
   val pattern = "^.*\\.jar$".r.pattern //x.x.x.jar pattern
 
 
-  val applicationSettings = Seq(
+  val appSettings = Seq(
     dirSetting := Map("conf" -> "conf", "lib" -> "lib", "bin" -> ""),
-    fileSetting := "dist",
+    prefix := "dist",
 
     copyDependenciesTask <<= (update, crossTarget) map {
       (updateReport, out) =>
@@ -28,7 +30,7 @@ object ApplicationPlugin extends Plugin {
         }
     }
     ,
-    distAppTask <<= (update, crossTarget, packageBin in Runtime, dirSetting, fileSetting) map {
+    distAppTask <<= (update, crossTarget, packageBin in Runtime, dirSetting, prefix) map {
       (updateReport, out, _, ds, fs) =>
 
         val buffers = ArrayBuffer[(File, String)]()

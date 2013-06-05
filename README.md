@@ -23,7 +23,6 @@ Sbt Application Plugin
         ├─conf    //conf目录下的配置
         ├─lib     //所有依赖的库(jar)
 
-
 ## 安装
         cd sbt-application-plugin
         sbt publish-local
@@ -32,20 +31,16 @@ Sbt Application Plugin
 ## 使用
 在project/plugins.sbt文件中添加内容：
 
-        addSbtPlugin("com.greatbit" %% "sbt-application-plugin" % "1.0.0")
+        addSbtPlugin("org.koala" %% "sbt-application-plugin" % "1.0.0")
 在project/Build.scala中添加类似内容:
         
-        import ApplicationPlugin._
-    	lazy val akkatest = 
-			Project(id = "test") settings(applicationSettings : _*) settings(
-        		fileSetting := "test", 
-        		dirSetting ++= Map("ext" -> "ext_dir")
-    	)
-`dirSetting`**缺省**`Map("conf" -> "conf", "bin" -> "","lib" -> "lib")`
+        import org.koala.sbt.SbtAppPlugin._
+    	lazy val projectName = Project(id = "test") settings(appSettings : _*) settings(	prefix := "test",dirSetting ++= Map("ext" -> "ext_dir"))
+`dirSetting`缺省值`Map("conf" -> "conf", "bin" -> "","lib" -> "lib")`
 
 ## 配置
-* `fileSetting` 打包文件名；
-* `dirSetting`  打包包含文件路径Map，key为包含的目录，value为打包文件的目录；
+* `prefix`      打包文件名前缀；
+* `dirSetting`  打包包含文件路径`Map`，`key`为包含的目录，`value`为打包文件的目录；
 
 ## 命令
         sbt dist-zip
