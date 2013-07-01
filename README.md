@@ -32,13 +32,14 @@ Sbt Application Plugin
 在project/plugins.sbt文件中添加内容：
 
         addSbtPlugin("org.koala" %% "sbt-application-plugin" % "1.0.0")
-在project/Build.scala中添加类似内容:
+在project/Build.scala中添加类似内容:    
         
         import org.koala.sbt.SbtAppPlugin._
     	lazy val projectName = Project(id = "test") settings(appSettings : _*) settings(
     	            prefix := "test",
     	            dirSetting ++= Map("ext" -> "ext_dir")
     	        )
+
 `dirSetting`缺省值`Map("conf" -> "conf", "bin" -> "","lib" -> "lib")`
 
 ## 配置
