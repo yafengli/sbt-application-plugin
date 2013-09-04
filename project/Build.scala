@@ -10,7 +10,7 @@ object Build extends Build {
       organization := "org.koala",
       version := "1.0.0",
       scalaVersion := "2.10.2",
-      sbtPlugin := true,
+      sbtPlugin := true,      
       resolvers ++= Seq(
         "Local Maven Repository" at "file:///d:/repository/",
         "202" at "http://221.231.148.202:8081/nexus/content/groups/public/"
