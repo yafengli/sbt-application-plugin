@@ -10,8 +10,7 @@ object Build extends Build {
       organization := "org.koala",
       version := "1.0.0",
       scalaVersion := "2.10.2",
-      sbtPlugin := true,
-      publishTo := Some(Resolver.file("file",  new File( "D:/Tools/play-2.2.0-M2/repository")) ),
+      sbtPlugin := true,      
       resolvers ++= Seq(
         "Local Maven Repository" at "file:///d:/repository/"
       )
