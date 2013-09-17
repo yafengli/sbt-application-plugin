@@ -13,8 +13,7 @@ object Build extends Build {
       sbtPlugin := true,
       publishTo := Some(Resolver.file("file",  new File( "D:/Tools/play-2.2.0-M2/repository")) ),
       resolvers ++= Seq(
-        "Local Maven Repository" at "file:///d:/repository/",
-        "202" at "http://221.231.148.202:8081/nexus/content/groups/public/"
+        "Local Maven Repository" at "file:///d:/repository/"
       )
     )
   )
