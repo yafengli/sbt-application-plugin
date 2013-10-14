@@ -9,8 +9,8 @@ object SbtAppPlugin extends Plugin {
   val dirSetting = SettingKey[Map[String, String]]("dir-setting")
   val prefix = SettingKey[String]("file-setting")
 
-  val copyDependenciesTask = TaskKey[Unit]("copy-dependencies")
-  val distAppTask = TaskKey[Unit]("dist-zip")
+  val copyDependenciesTask = TaskKey[Unit]("copyDependencies")
+  val distZipTask = TaskKey[Unit]("distZip")
 
   val buffer = new StringBuffer
   val pattern = "^.*\\.jar$".r.pattern //x.x.x.jar pattern
@@ -30,7 +30,7 @@ object SbtAppPlugin extends Plugin {
         }
     }
     ,
-    distAppTask <<= (update, crossTarget, packageBin in Runtime, dirSetting, prefix) map {
+    distZipTask <<= (update, crossTarget, packageBin in Runtime, dirSetting, prefix) map {
       (updateReport, out, _, ds, fs) =>
 
         val buffers = ArrayBuffer[(File, String)]()
@@ -49,7 +49,9 @@ object SbtAppPlugin extends Plugin {
             copy(new File(it._1), it._2, buffers)
         }
 
-        IO.zip(buffers, (out / "%s.zip".format(fs)))
+        val dist = (out / "../universal/%s.zip".format(fs))
+        IO.zip(buffers, dist)
+        IO.unzip(dist, (out / "../universal/stage"))
     }
   )
 
