@@ -12,8 +12,7 @@ object Build extends Build {
       scalaVersion := "2.10.2",
       sbtPlugin := true,      
       resolvers ++= Seq(
-        "Local Maven Repository" at "file:///d:/repository/",
-        "202" at "http://221.231.148.202:8081/nexus/content/groups/public/"
+        "Local Maven Repository" at "file:///d:/repository/"
       )
     )
   )
