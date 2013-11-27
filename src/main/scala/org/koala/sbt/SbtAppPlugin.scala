@@ -2,40 +2,42 @@ package org.koala.sbt
 
 import sbt._
 import Keys._
-import scala.collection.mutable.ArrayBuffer
+import scala.collection._
 
 object SbtAppPlugin extends Plugin {
   //dir settings copy files from key to value.
-  val dirSetting = SettingKey[Map[String, String]]("dir-setting")
+  val dirSetting = SettingKey[Seq[(String, String)]]("dir-setting")
   val prefix = SettingKey[String]("file-setting")
 
-  val copyDependenciesTask = TaskKey[Unit]("copyDependencies")
-  val distZipTask = TaskKey[Unit]("distZip")
+  val copyDependenciesTask = TaskKey[Unit]("copy-dependencies")
+  val distZipTask = TaskKey[Unit]("dist-zip")
 
   val buffer = new StringBuffer
   val pattern = "^.*\\.jar$".r.pattern //x.x.x.jar pattern
 
-
   val appSettings = Seq(
-    dirSetting := Map("conf" -> "conf", "lib" -> "lib", "bin" -> ""),
     prefix := "dist",
+    dirSetting := mutable.Seq("conf" -> "conf", "lib" -> "lib", "bin" -> ""),
 
-    copyDependenciesTask <<= (update, crossTarget) map {
-      (updateReport, out) =>
-        updateReport.allFiles foreach {
+    copyDependenciesTask <<= (update, ivyConfiguration, crossTarget) map {
+      (updateReport, ivy, out) =>
+        updateReport.allFiles.foreach {
           srcPath =>
             buffer.append("lib/" + srcPath.getName + ":")
             val destPath = out / "lib" / srcPath.getName
             IO.copyFile(srcPath, destPath, preserveLastModified = true)
+
+            updateReport.allFiles.foreach(f => println("#" + f.getAbsolutePath))
+            out.listFiles().foreach(f => println("@" + f.getAbsolutePath))
+
         }
-    }
-    ,
+    },
     distZipTask <<= (update, crossTarget, packageBin in Runtime, dirSetting, prefix) map {
       (updateReport, out, _, ds, fs) =>
 
-        val buffers = ArrayBuffer[(File, String)]()
+        val buffers = mutable.ArrayBuffer[(File, String)]()
         //dependencies jar
-        updateReport.select(Set("compile", "runtime")).foreach {
+        updateReport.select(Set("compile")).foreach {
           file =>
             buffers += ((file, "lib/%s".format(file.getName)))
         }
@@ -55,7 +57,7 @@ object SbtAppPlugin extends Plugin {
     }
   )
 
-  def copy(file: File, prefix: String, buffers: ArrayBuffer[(File, String)]) {
+  def copy(file: File, prefix: String, buffers: mutable.ArrayBuffer[(File, String)]) {
     if (file.exists()) {
       file.listFiles().foreach {
         it =>
