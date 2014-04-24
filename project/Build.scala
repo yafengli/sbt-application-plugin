@@ -9,10 +9,9 @@ object Build extends Build {
       name := "sbt-application-plugin",
       organization := "org.koala",
       version := "1.0.0",
-      scalaVersion := "2.10.2",
       sbtPlugin := true,      
       resolvers ++= Seq(
-        "Local Maven Repository" at "file:///d:/repository/"
+        "Local Maven Repository" at "file:///f:/repository/"
       )
     )
   )
