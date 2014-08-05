@@ -6,20 +6,29 @@ import scala.collection._
 
 object SbtAppPlugin extends Plugin {
   //dir settings copy files from key to value.
-  val dirSetting = SettingKey[Seq[(String, String)]]("dir-setting")
-  val prefix = SettingKey[String]("file-setting")
+  val dirSetting = settingKey[Seq[(String, String)]]("dir-setting")
+  val prefix = settingKey[String]("file-setting")
 
-  val copyDependenciesTask = TaskKey[Unit]("copy-dependencies")
-  val distZipTask = TaskKey[Unit]("dist-zip")
+  val copyDependencies = taskKey[Unit]("copy-dependencies")
+  val distZip = taskKey[Unit]("dist-zip")
 
   val buffer = new StringBuffer
-  val pattern = "^.*\\.jar$".r.pattern //x.x.x.jar pattern
+  val pattern = """^.*\.jar$""".r.pattern //x.x.x.jar pattern
+
+  val filter = (o: Any) => {
+    if (o.isInstanceOf[File]) {
+      val f = o.asInstanceOf[File]
+      if (!f.exists()) sys.error(s">>NOT FOUND ${f.getAbsolutePath}.")
+      pattern.matcher(f.name).find() && f.exists()
+    }
+    else false
+  }
 
   val appSettings = Seq(
-    prefix := "dist",
+    exportJars := true,
+    prefix := s"${organization}-${name}-${version}",
     dirSetting := mutable.Seq("conf" -> "conf", "lib" -> "lib", "bin" -> ""),
-
-    copyDependenciesTask <<= (update, ivyConfiguration, crossTarget) map {
+    copyDependencies <<= (update, ivyConfiguration, crossTarget) map {
       (updateReport, ivy, out) =>
         updateReport.allFiles.foreach {
           srcPath =>
@@ -27,31 +36,38 @@ object SbtAppPlugin extends Plugin {
             val destPath = out / "lib" / srcPath.getName
             IO.copyFile(srcPath, destPath, preserveLastModified = true)
 
-            updateReport.allFiles.foreach(f => println("#" + f.getAbsolutePath))
-            out.listFiles().foreach(f => println("@" + f.getAbsolutePath))
-
+            updateReport.allFiles.filter(filter).foreach(f => println(">>" + f.getAbsolutePath))
+            out.listFiles().filter(filter).foreach(f => println("::" + f.getAbsolutePath))
         }
     },
-    distZipTask <<= (update, crossTarget, packageBin in Runtime, dirSetting, prefix) map {
-      (updateReport, out, _, ds, fs) =>
+    distZip <<= (update, crossTarget, dependencyClasspath in Runtime, dirSetting, prefix) map {
+      (updateReport, out, dr, ds, ps) =>
 
         val buffers = mutable.ArrayBuffer[(File, String)]()
         //dependencies jar
-        updateReport.select(Set("compile")).foreach {
+        updateReport.select(Set("compile")).filter(filter).foreach {
           file =>
-            buffers += ((file, "lib/%s".format(file.getName)))
+            buffers += ((file, s"lib/${file.name}"))
         }
         //package jar
-        out.listFiles.filter(p => pattern.matcher(p.name).find()).foreach {
+        out.listFiles.filter(filter).foreach {
           file =>
-            buffers += ((file, "lib/%s".format(file.getName)))
+            buffers += ((file, s"lib/${file.name}"))
         }
+        //module dependOn jar
+        dr.filter(p => p.data.exists() && p.data.isDirectory).foreach {
+          t =>
+            val lib = t.data.getParentFile.listFiles().filter(filter)
+            if (lib.size < 1) sys.error(s"${t.data.getParent} NOT FOUND JAR FILE.")
+            else lib.foreach(file => buffers += ((file, s"lib/${file.name}")))
+        }
+        //copy jars
         ds.foreach {
           it =>
             copy(new File(it._1), it._2, buffers)
         }
 
-        val dist = (out / "../universal/%s.zip".format(fs))
+        val dist = (out / s"../universal/${ps}.zip")
         IO.zip(buffers, dist)
         IO.unzip(dist, (out / "../universal/stage"))
     }
