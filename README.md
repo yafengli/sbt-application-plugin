@@ -36,7 +36,7 @@ Sbt Application Plugin
         
         import org.koala.sbt.SbtAppPlugin._
 
-    	lazy val projectName = project.in(file".")).settings(appSettings : _*).settings(prefix := "test",dirSetting ++= Seq("ext" -> "ext_dir")   )
+    	lazy val name = project.in(file".")).settings(appSettings : _*, prefix := "test",dirSetting ++= Seq("ext" -> "ext_dir"))
 
 #### 配置
 需要配置两个参数：
