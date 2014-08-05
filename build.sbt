@@ -1,5 +1,3 @@
-
-
 name := "sbt-application-plugin"
 
 organization := "org.koala"

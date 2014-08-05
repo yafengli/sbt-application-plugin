@@ -25,8 +25,7 @@ object SbtAppPlugin extends Plugin {
   }
 
   val appSettings = Seq(
-    exportJars := true,
-    prefix := s"${organization}-${name}-${version}",
+    prefix := s"${organization.value}-${name.value}-${version.value}",
     dirSetting := mutable.Seq("conf" -> "conf", "lib" -> "lib", "bin" -> ""),
     copyDependencies <<= (update, ivyConfiguration, crossTarget) map {
       (updateReport, ivy, out) =>
@@ -49,17 +48,18 @@ object SbtAppPlugin extends Plugin {
           file =>
             buffers += ((file, s"lib/${file.name}"))
         }
+        //module dependOn jar
+        dr.filter(p => p.data.exists() && p.data.isDirectory).foreach {
+          t =>
+            t.data.getParentFile.listFiles().filter(filter).headOption match {
+              case Some(file) => buffers += ((file, s"lib/${file.name}"))
+              case None => sys.error(s"${t.data.getParent} NOT FOUND JAR FILE.")
+            }
+        }
         //package jar
         out.listFiles.filter(filter).foreach {
           file =>
             buffers += ((file, s"lib/${file.name}"))
-        }
-        //module dependOn jar
-        dr.filter(p => p.data.exists() && p.data.isDirectory).foreach {
-          t =>
-            val lib = t.data.getParentFile.listFiles().filter(filter)
-            if (lib.size < 1) sys.error(s"${t.data.getParent} NOT FOUND JAR FILE.")
-            else lib.foreach(file => buffers += ((file, s"lib/${file.name}")))
         }
         //copy jars
         ds.foreach {
