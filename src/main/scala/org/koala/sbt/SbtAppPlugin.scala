@@ -12,8 +12,7 @@ object SbtAppPlugin extends Plugin {
   val copyDependencies = taskKey[Unit]("copy-dependencies")
   val distZip = taskKey[Unit]("dist-zip")
 
-  val buffer = new StringBuffer
-  val pattern = """^.*\.jar$""".r.pattern //x.x.x.jar pattern
+    val pattern = """^.*\.jar$""".r.pattern //x.x.x.jar pattern
 
   val filter = (o: Any) => {
     if (o.isInstanceOf[File]) {
@@ -25,13 +24,13 @@ object SbtAppPlugin extends Plugin {
   }
 
   val appSettings = Seq(
+    exportJars := true,
     prefix := s"${organization.value}-${name.value}-${version.value}",
     dirSetting := mutable.Seq("conf" -> "conf", "lib" -> "lib", "bin" -> ""),
     copyDependencies <<= (update, ivyConfiguration, crossTarget) map {
       (updateReport, ivy, out) =>
         updateReport.allFiles.foreach {
           srcPath =>
-            buffer.append("lib/" + srcPath.getName + ":")
             val destPath = out / "lib" / srcPath.getName
             IO.copyFile(srcPath, destPath, preserveLastModified = true)
 
