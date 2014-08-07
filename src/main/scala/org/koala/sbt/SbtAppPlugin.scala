@@ -42,24 +42,24 @@ object SbtAppPlugin extends Plugin {
     distZip <<= (update, crossTarget, dependencyClasspath in Runtime, dirSetting, prefix) map {
       (updateReport, out, dr, ds, ps) =>
 
-        val buffers = mutable.ArrayBuffer[(File, String)]()
+        val buffers = mutable.HashMap[File, String]()
         //dependencies jar
         updateReport.select(Set("compile")).filter(filter).foreach {
           file =>
-            buffers += ((file, s"lib/${file.name}"))
+            buffers += file -> s"lib/${file.name}"
         }
         //module dependOn jar
         dr.filter(p => p.data.exists() && p.data.isDirectory).foreach {
           t =>
             t.data.getParentFile.listFiles().filter(filter).headOption match {
-              case Some(file) => buffers += ((file, s"lib/${file.name}"))
-              case None => sys.error(s"${t.data.getParent} NOT FOUND JAR FILE.")
+              case Some(file) => buffers += file -> s"lib/${file.name}"
+              case None =>
             }
         }
         //package jar
         out.listFiles.filter(filter).foreach {
           file =>
-            buffers += ((file, s"lib/${file.name}"))
+            buffers += file -> s"lib/${file.name}"
         }
         //copy jars
         ds.foreach {
@@ -73,12 +73,12 @@ object SbtAppPlugin extends Plugin {
     }
   )
 
-  def copy(file: File, prefix: String, buffers: mutable.ArrayBuffer[(File, String)]) {
+  def copy(file: File, prefix: String, buffers: mutable.HashMap[File, String]) {
     if (file.exists()) {
       file.listFiles().foreach {
         it =>
           val path = if (prefix.trim.length > 0) "%s/%s".format(prefix, it.name) else it.name
-          if (it.isFile) buffers += ((it, path))
+          if (it.isFile) buffers += it -> path
           else if (it.isDirectory) copy(it, path, buffers)
       }
     }
