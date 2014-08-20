@@ -12,7 +12,7 @@ object SbtAppPlugin extends Plugin {
   val copyDependencies = taskKey[Unit]("copy-dependencies")
   val distZip = taskKey[Unit]("dist-zip")
 
-    val pattern = """^.*\.jar$""".r.pattern //x.x.x.jar pattern
+  val pattern = """^.*[^javadoc|^sources]\.jar$""".r.pattern //x.x.x.jar pattern
 
   val filter = (o: Any) => {
     if (o.isInstanceOf[File]) {
