@@ -5,12 +5,12 @@ import Keys._
 import scala.collection._
 
 object SbtAppPlugin extends Plugin {
-  //dir settings copy files from key to value.
   val dirSetting = settingKey[Seq[(String, String)]]("dir-setting")
   val prefix = settingKey[String]("file-setting")
 
-  val copyDependencies = taskKey[Unit]("copy-dependencies")
-  val distZip = taskKey[Unit]("dist-zip")
+  val copyDependencies = TaskKey[Unit]("copy-dependencies", "Copy all dependencies to target/lib")
+  val distZip = TaskKey[Unit]("dist-zip", "Dist a .zip file include all executable.")
+  val standalone = TaskKey[Unit]("standalone", "Pakcage a standalone executable jar.")
 
   val pattern = """^.*[^javadoc|^sources]\.jar$""".r.pattern //x.x.x.jar pattern
 
@@ -37,6 +37,13 @@ object SbtAppPlugin extends Plugin {
             updateReport.allFiles.filter(filter).foreach(f => println(">>" + f.getAbsolutePath))
             out.listFiles().filter(filter).foreach(f => println("::" + f.getAbsolutePath))
         }
+    },
+    standalone <<= (packageBin in Compile, crossTarget, dependencyClasspath in Runtime, dirSetting, prefix, streams) map {
+      (artifact, out, classpath, ds, ps, s) =>
+        val thisArtifactMapping = (artifact, (file("main") / artifact.name).getPath)
+        val mappings = Seq(thisArtifactMapping) ++ Attributed.data(classpath).map(f => (f, (file("lib") / f.name).getPath)).filter(_._1 != artifact)
+        val packageConf = new Package.Configuration(mappings, (out / s"${ps}.jar"), Seq())
+        Package(packageConf, (out / s"${ps}.jar.tmp"), s.log)
     },
     distZip <<= (update, crossTarget, dependencyClasspath in Runtime, dirSetting, prefix) map {
       (updateReport, out, dr, ds, ps) =>
