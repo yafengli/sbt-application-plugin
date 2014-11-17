@@ -24,9 +24,16 @@ Sbt Application Plugin
         ├─lib     //所有依赖的库(jar)
 
 #### 安装
-        cd sbt-application-plugin
-        sbt publish-local
+        
+       	cd sbt-application-plugin
 
++ 发布到本地Ivy2 Repository       	
+        
+        sbt publishLocal
+
++ 发布到本地`Maven Repository`，修改`build.sbt`:`publishTo := Some(Resolver.file("file",  new File("path/your/m2repo")))`
+
+				sbt publish
 
 #### 使用
 在project/plugins.sbt文件中添加内容：
