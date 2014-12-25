@@ -1,7 +1,8 @@
 package org.koala.sbt
 
+import sbt.Keys._
 import sbt._
-import Keys._
+
 import scala.collection._
 
 object SbtAppPlugin extends Plugin {
@@ -26,15 +27,15 @@ object SbtAppPlugin extends Plugin {
   val appSettings = Seq(
     exportJars := true,
     prefix := s"${organization.value}-${name.value}-${version.value}",
-    dirSetting := mutable.Seq("conf" -> "conf", "lib" -> "lib", "bin" -> ""),
+    dirSetting := mutable.Buffer("conf" -> "conf", "lib" -> "lib", "bin" -> ""),
     copyDependencies <<= (update, ivyConfiguration, crossTarget) map {
-      (updateReport, ivy, out) =>
-        updateReport.allFiles.foreach {
+      (ur, ivy, out) =>
+        ur.allFiles.foreach {
           srcPath =>
             val destPath = out / "lib" / srcPath.getName
             IO.copyFile(srcPath, destPath, preserveLastModified = true)
 
-            updateReport.allFiles.filter(filter).foreach(f => println(">>" + f.getAbsolutePath))
+            ur.allFiles.filter(filter).foreach(f => println(">>" + f.getAbsolutePath))
             out.listFiles().filter(filter).foreach(f => println("::" + f.getAbsolutePath))
         }
     },
@@ -46,31 +47,20 @@ object SbtAppPlugin extends Plugin {
         Package(packageConf, (out / s"${ps}.jar.tmp"), s.log)
     },
     distZip <<= (update, crossTarget, dependencyClasspath in Runtime, dirSetting, prefix) map {
-      (updateReport, out, dr, ds, ps) =>
+      (ur, out, dr, ds, ps) =>
+        implicit val buffers = mutable.Buffer[(File, String)]()
 
-        val buffers = mutable.HashMap[File, String]()
-        //dependencies jar
-        updateReport.select(Set("compile")).filter(filter).foreach {
-          file =>
-            buffers += file -> s"lib/${file.name}"
-        }
-        //module dependOn jar
-        dr.filter(p => p.data.exists() && p.data.isDirectory).foreach {
-          t =>
-            t.data.getParentFile.listFiles().filter(filter).headOption match {
-              case Some(file) => buffers += file -> s"lib/${file.name}"
-              case None =>
-            }
-        }
-        //package jar
-        out.listFiles.filter(filter).foreach {
-          file =>
-            buffers += file -> s"lib/${file.name}"
-        }
+        //dependencies jar package jar module dependOn jar
+        (ur.select(Set("compile")) ++ out.listFiles ++ dr.filter(p => p.data.exists() && p.data.isDirectory)
+          .flatMap(_.data.get)).filter(filter).foreach(f => buffers += f -> s"lib/${f.name}")
+
         //copy jars
         ds.foreach {
           it =>
-            copy(new File(it._1), it._2, buffers)
+            new File(it._1) match {
+              case d: File if d.isDirectory => d.listFiles().foreach(copy(_, it._2))
+              case _ =>
+            }
         }
 
         val dist = (out / s"../universal/${ps}.zip")
@@ -79,14 +69,19 @@ object SbtAppPlugin extends Plugin {
     }
   )
 
-  def copy(file: File, prefix: String, buffers: mutable.HashMap[File, String]) {
-    if (file.exists()) {
-      file.listFiles().foreach {
-        it =>
-          val path = if (prefix.trim.length > 0) "%s/%s".format(prefix, it.name) else it.name
-          if (it.isFile) buffers += it -> path
-          else if (it.isDirectory) copy(it, path, buffers)
+  def copy(file: File, prefix: String)(implicit buffers: mutable.Buffer[(File, String)]): Unit = {
+    try {
+      file match {
+        case f: File if f.isFile => buffers += f -> path(prefix, f)
+        case d: File if d.isDirectory => d.listFiles().foreach(f => copy(f, path(prefix, d)))
+        case _ =>
       }
+    } catch {
+      case e: Exception => e.printStackTrace()
     }
+  }
+
+  private def path(prefix: String, f: File): String = {
+    if (prefix != null && prefix.trim.length > 0) "%s/%s".format(prefix, f.name) else f.name
   }
 }
