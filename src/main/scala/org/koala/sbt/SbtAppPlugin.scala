@@ -12,6 +12,7 @@ object SbtAppPlugin extends Plugin {
   val copyDependencies = TaskKey[Unit]("copy-dependencies", "Copy all dependencies to target/lib")
   val distZip = TaskKey[Unit]("dist-zip", "Dist a .zip file include all executable.")
   val standalone = TaskKey[Unit]("standalone", "Pakcage a standalone executable jar.")
+  val treeDependencies = TaskKey[Unit]("tree-dependencies", "Tree view all dependencies.")
 
   val pattern = """^.*[^javadoc|^sources]\.jar$""".r.pattern //x.x.x.jar pattern
 
@@ -38,6 +39,12 @@ object SbtAppPlugin extends Plugin {
             ur.allFiles.filter(filter).foreach(f => println(">>" + f.getAbsolutePath))
             out.listFiles().filter(filter).foreach(f => println("::" + f.getAbsolutePath))
         }
+    },
+    treeDependencies <<= (update,dependencyClasspath in Runtime) map {
+      (u,d) =>
+        u.allFiles.foreach(f => println(f.getAbsolutePath))
+        println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        d.foreach(f => println(f.data.getAbsolutePath))                
     },
     standalone <<= (packageBin in Compile, crossTarget, dependencyClasspath in Runtime, dirSetting, prefix, streams) map {
       (artifact, out, classpath, ds, ps, s) =>
