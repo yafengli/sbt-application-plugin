@@ -1,8 +1,5 @@
 import org.koala.sbt.SbtAppPlugin._
 
-
-
-
 lazy val sbt_app_plugin = project.in(file(".")).settings(
 	name := "demo",
 	organization := "org.koala",
