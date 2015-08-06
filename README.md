@@ -19,7 +19,7 @@ Sbt Application Plugin
 
 打包后的应用目录结构类似：
 
-        ├─*       //bin目录下的执行脚本
+        ├─bin/*   //bin目录下的执行脚本
         ├─conf    //conf目录下的配置
         ├─lib     //所有依赖的库(jar)
 
@@ -43,13 +43,19 @@ Sbt Application Plugin
         
         import org.koala.sbt.SbtAppPlugin._
 
-    	lazy val name = project.in(file".")).settings(mainClass := Some("demo.Hello")).settings(appSettings : _*).settings(prefix := "test",dirSetting ++= Seq("ext" -> "ext_dir"))
+    	lazy val name = project.in(file".")).settings(mainClass := Some("demo.Hello")).settings(appSettings : _*).settings(dirSetting ++= Seq("ext"))
 
-#### 配置
-需要配置两个参数：
-+ `prefix`：打包文件名前缀，缺省为`organization-name-version`；
-+ `dirSetting`：打包包含文件路径`Map`，`key`为包含的目录，`value`为打包文件的目录，缺省值`Seq("conf" -> "conf", "bin" -> "bin","lib" -> "lib")`；
+#### 配置属性
++ `orgination`：组织名
++ `name`：项目名
++ `version`：版本号
++ `dirSetting`：打包目录序列`Seq[String]`，缺省值`Seq("bin", "conf","lib")`；
 
-#### 命令
+#### 构建发布
++ 打包：`sbt distZip`
++ 生成文件`target/universal/[orgination]-[name]-[version].zip`
 
-        sbt distZip
+#### 运行
++ `unzip [orgination]-[name]-[version].zip`
++ `Windows`:`bin/[name].bat`
++ `Linux`:`chmod 777 bin/[name] && bin/[name]`

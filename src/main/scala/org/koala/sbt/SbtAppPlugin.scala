@@ -7,8 +7,7 @@ import scala.annotation.tailrec
 import scala.collection._
 
 object SbtAppPlugin extends Plugin {
-  val dirSetting = settingKey[Seq[(String, String)]]("dir-setting")
-  val prefix = settingKey[String]("file-setting")
+  val dirSetting = settingKey[Seq[String]]("dir-setting")
   val copyDependencies = TaskKey[Unit]("copy-dependencies", "Copy all dependencies to target/lib")
   val distZip = TaskKey[Unit]("dist-zip", "Dist a .zip file include all executable.")
   val treeDependencies = TaskKey[Unit]("tree-dependencies", "Tree view all dependencies.")
@@ -26,8 +25,7 @@ object SbtAppPlugin extends Plugin {
 
   val appSettings = Seq(
     exportJars := true,
-    prefix := s"${organization.value}-${name.value}-${version.value}",
-    dirSetting := mutable.Buffer("conf" -> "conf", "lib" -> "lib", "bin" -> "bin"),
+    dirSetting := mutable.Buffer("conf", "lib", "bin"),
     copyDependencies <<= (update, ivyConfiguration, crossTarget) map {
       (ur, ivy, out) =>
         ur.allFiles.foreach {
@@ -45,8 +43,8 @@ object SbtAppPlugin extends Plugin {
         println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
         d.foreach(f => println(f.data.getAbsolutePath))
     },
-    distZip <<= (update, crossTarget, dependencyClasspath in Runtime, dirSetting, prefix, mainClass, organization, name) map {
-      (ur, out, dr, ds, ps, mc, org, name) =>
+    distZip <<= (update, crossTarget, dependencyClasspath in Runtime, dirSetting, mainClass, organization, name, version) map {
+      (ur, out, dr, ds, mc, org, name, v) =>
         try {
           implicit val buffers = mutable.Buffer[(File, String)]()
           //dependencies jar package jar module dependOn jar
@@ -55,15 +53,14 @@ object SbtAppPlugin extends Plugin {
 
           //copy jars
           ds.foreach {
-            it =>
-              new File(it._1) match {
-                case d: File if d.isDirectory => d.listFiles().foreach(copy(_, it._2))
-                case _ =>
-              }
+            n =>
+              val d = new File(n)
+              if (d.isDirectory) d.listFiles().foreach(copy(_, d.name)) else buffers += d -> d.name
           }
           //run shell
-          buffers ++= <::((out / s"${org}-${name}.bat", SbtAppShell.windows, Map('mainClass -> mc.get)), (out / s"${org}-${name}", SbtAppShell.linux, Map('mainClass -> mc.get)))
-          val dist = (out / s"../universal/${ps}.zip")
+          buffers ++= <::((out / s"${name}.bat", SbtAppShell.windows, Map('mainClass -> mc.get)), (out / s"${name}", SbtAppShell.linux, Map('mainClass -> mc.get)))
+          val dist = (out / s"../universal/${org}-${name}-${v}.zip")
+
           IO.zip(buffers, dist)
           IO.unzip(dist, (out / "../universal/stage"))
         } catch {
@@ -86,6 +83,7 @@ object SbtAppPlugin extends Plugin {
 
   private def writeToFile(f: File, s: String, templates: Map[Symbol, String]): Unit = {
     val pw = new java.io.PrintWriter(f)
+    f.setExecutable(true)
     try pw.write(replaceTemplates(s, templates)) finally pw.close()
   }
 
@@ -121,6 +119,6 @@ object SbtAppPlugin extends Plugin {
         loop(template, template.length, value)
     }
 
-    builder.toString
+    builder.toString()
   }
 }

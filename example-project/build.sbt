@@ -9,4 +9,4 @@ lazy val sbt_app_plugin = project.in(file(".")).settings(
 	libraryDependencies ++= Seq(
 		"ch.qos.logback" % "logback-classic" % "1.1.2"    
 	)	
-) settings(appSettings:_*) settings(dirSetting ++= Seq("ext" -> "ext_conf"))
+) settings(appSettings:_*) settings(dirSetting ++= Seq("ext"))
