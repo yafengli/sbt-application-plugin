@@ -57,5 +57,5 @@ Sbt Application Plugin
 
 #### 运行
 + `unzip [orgination]-[name]-[version].zip`
-+ `Windows`:`bin/[name].bat`
-+ `Linux`:`chmod 777 bin/[name] && bin/[name]`
++ Windows:`bin/[name].bat`
++ Linux:`chmod 777 bin/[name] && bin/[name]`
