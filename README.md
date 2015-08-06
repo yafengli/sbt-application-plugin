@@ -43,12 +43,12 @@ Sbt Application Plugin
         
         import org.koala.sbt.SbtAppPlugin._
 
-    	lazy val name = project.in(file".")).settings(appSettings : _*).settings(prefix := "test",dirSetting ++= Seq("ext" -> "ext_dir"))
+    	lazy val name = project.in(file".")).settings(mainClass := Some("demo.Hello")).settings(appSettings : _*).settings(prefix := "test",dirSetting ++= Seq("ext" -> "ext_dir"))
 
 #### 配置
 需要配置两个参数：
 + `prefix`：打包文件名前缀，缺省为`organization-name-version`；
-+ `dirSetting`：打包包含文件路径`Map`，`key`为包含的目录，`value`为打包文件的目录，缺省值`Seq("conf" -> "conf", "bin" -> "","lib" -> "lib")`；
++ `dirSetting`：打包包含文件路径`Map`，`key`为包含的目录，`value`为打包文件的目录，缺省值`Seq("conf" -> "conf", "bin" -> "bin","lib" -> "lib")`；
 
 #### 命令
 
