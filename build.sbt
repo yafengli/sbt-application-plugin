@@ -4,6 +4,6 @@ organization := "org.koala"
 
 version := "1.0.1"
 
-sbtPlugin := true  
+sbtPlugin := true
 
 publishTo := Some(Resolver.file("file",  new File("d:/repository/.m2")))

@@ -27,13 +27,13 @@ Sbt Application Plugin
         
        	cd sbt-application-plugin
 
-+ 发布到本地Ivy2 Repository       	
++ 发布到本地`Ivy2 Repository`
         
         sbt publishLocal
 
 + 发布到本地`Maven Repository`，修改`build.sbt`:`publishTo := Some(Resolver.file("file",  new File("path/your/m2repo")))`
 
-				sbt publish
+        sbt publish
 
 #### 使用
 在project/plugins.sbt文件中添加内容：
@@ -48,8 +48,8 @@ Sbt Application Plugin
 #### 配置
 需要配置两个参数：
 + `prefix`：打包文件名前缀，缺省为`organization-name-version`；
-+ `dirSetting`：打包包含文件路径`Map`，`key`为包含的目录，`value`为打包文件的目录，缺省值`Map("conf" -> "conf", "bin" -> "","lib" -> "lib")`；
++ `dirSetting`：打包包含文件路径`Map`，`key`为包含的目录，`value`为打包文件的目录，缺省值`Seq("conf" -> "conf", "bin" -> "","lib" -> "lib")`；
 
 #### 命令
 
-        sbt dist-zip
+        sbt distZip

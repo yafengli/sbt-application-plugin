@@ -11,7 +11,6 @@ object SbtAppPlugin extends Plugin {
 
   val copyDependencies = TaskKey[Unit]("copy-dependencies", "Copy all dependencies to target/lib")
   val distZip = TaskKey[Unit]("dist-zip", "Dist a .zip file include all executable.")
-  val standalone = TaskKey[Unit]("standalone", "Pakcage a standalone executable jar.")
   val treeDependencies = TaskKey[Unit]("tree-dependencies", "Tree view all dependencies.")
 
   val pattern = """^.*[^javadoc|^sources]\.jar$""".r.pattern //x.x.x.jar pattern
@@ -28,7 +27,7 @@ object SbtAppPlugin extends Plugin {
   val appSettings = Seq(
     exportJars := true,
     prefix := s"${organization.value}-${name.value}-${version.value}",
-    dirSetting := mutable.Buffer("conf" -> "conf", "lib" -> "lib", "bin" -> ""),
+    dirSetting := mutable.Buffer("conf" -> "conf", "lib" -> "lib", "bin" -> "bin"),
     copyDependencies <<= (update, ivyConfiguration, crossTarget) map {
       (ur, ivy, out) =>
         ur.allFiles.foreach {
@@ -40,18 +39,11 @@ object SbtAppPlugin extends Plugin {
             out.listFiles().filter(filter).foreach(f => println("::" + f.getAbsolutePath))
         }
     },
-    treeDependencies <<= (update,dependencyClasspath in Runtime) map {
-      (u,d) =>
+    treeDependencies <<= (update, dependencyClasspath in Runtime) map {
+      (u, d) =>
         u.allFiles.foreach(f => println(f.getAbsolutePath))
         println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-        d.foreach(f => println(f.data.getAbsolutePath))                
-    },
-    standalone <<= (packageBin in Compile, crossTarget, dependencyClasspath in Runtime, dirSetting, prefix, streams) map {
-      (artifact, out, classpath, ds, ps, s) =>
-        val thisArtifactMapping = (artifact, (file("main") / artifact.name).getPath)
-        val mappings = Seq(thisArtifactMapping) ++ Attributed.data(classpath).map(f => (f, (file("lib") / f.name).getPath)).filter(_._1 != artifact)
-        val packageConf = new Package.Configuration(mappings, (out / s"${ps}.jar"), Seq())
-        Package(packageConf, (out / s"${ps}.jar.tmp"), s.log)
+        d.foreach(f => println(f.data.getAbsolutePath))
     },
     distZip <<= (update, crossTarget, dependencyClasspath in Runtime, dirSetting, prefix) map {
       (ur, out, dr, ds, ps) =>
