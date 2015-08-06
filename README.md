@@ -56,6 +56,7 @@ Sbt Application Plugin
 + 生成文件`target/universal/[orgination]-[name]-[version].zip`
 
 #### 运行
-+ `unzip [orgination]-[name]-[version].zip`
-+ Windows:`bin/[name].bat`
-+ Linux:`chmod 777 bin/[name] && bin/[name]`
+
+        unzip [orgination]-[name]-[version].zip
+        bin/[name].bat                          //Windows
+        chmod 777 bin/[name] && bin/[name]      //Linux
