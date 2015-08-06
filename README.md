@@ -24,9 +24,6 @@ Sbt Application Plugin
         ├─lib     //所有依赖的库(jar)
 
 #### 安装
-        
-       	cd sbt-application-plugin
-
 + 发布到本地`Ivy2 Repository`
         
         sbt publishLocal
@@ -46,8 +43,8 @@ Sbt Application Plugin
     	lazy val name = project.in(file".")).settings(mainClass := Some("demo.Hello")).settings(appSettings : _*).settings(dirSetting ++= Seq("ext"))
 
 #### 配置属性
-+ `orgination`：组织名
-+ `name`：项目名
++ `orgination`：组织名称
++ `name`：项目名称
 + `version`：版本号
 + `dirSetting`：打包目录序列`Seq[String]`，缺省值`Seq("bin", "conf","lib")`；
 
