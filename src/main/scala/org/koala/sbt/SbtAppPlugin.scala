@@ -58,7 +58,8 @@ object SbtAppPlugin extends Plugin {
               if (d.isDirectory) d.listFiles().foreach(copy(_, d.name)) else buffers += d -> d.name
           }
           //run shell
-          buffers ++= <::((out / s"${name}.bat", SbtAppShell.windows, Map('mainClass -> mc.get)), (out / s"${name}", SbtAppShell.linux, Map('mainClass -> mc.get)))
+          if (mc.isDefined) buffers ++= <::((out / s"${name}.bat", SbtAppShell.windows, Map('mainClass -> mc.get)), (out / s"${name}", SbtAppShell.linux, Map('mainClass -> mc.get)))
+
           val dist = (out / s"../universal/${org}-${name}-${v}.zip")
 
           IO.zip(buffers, dist)
