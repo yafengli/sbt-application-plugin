@@ -6,33 +6,34 @@ import sbt._
 import scala.annotation.tailrec
 import scala.collection._
 
+object Import {
+  val dirSetting = settingKey[Seq[String]]("dir-setting")
+  val distZip = taskKey[Unit]("dist-zip files.")
+  val treeDeps = taskKey[Unit]("tree-dependencies.")
+  val copyDeps = taskKey[Unit]("copy-dependencies.")
+  val hello = taskKey[Unit]("hello.")
+  val pattern = """^.*[^javadoc|^sources]\.jar$""".r.pattern
+  //x.x.x.jar pattern
 
-object SbtDistApp extends sbt.AutoPlugin {
-
-  object Import {
-    val dirSetting = settingKey[Seq[String]]("dir-setting")
-    val distZip = taskKey[Unit]("dist-zip files.")
-    val treeDeps = taskKey[Unit]("tree-dependencies.")
-    val copyDeps = taskKey[Unit]("copy-dependencies.")
-    val hello = taskKey[Unit]("hello.")
-    val pattern = """^.*[^javadoc|^sources]\.jar$""".r.pattern
-    //x.x.x.jar pattern
-
-    val filter = (o: Any) => {
-      if (o.isInstanceOf[File]) {
-        val f = o.asInstanceOf[File]
-        if (!f.exists()) sys.error(s">>NOT FOUND ${f.getAbsolutePath}.")
-        pattern.matcher(f.name).find() && f.exists()
-      }
-      else false
+  val filter = (o: Any) => {
+    if (o.isInstanceOf[File]) {
+      val f = o.asInstanceOf[File]
+      if (!f.exists()) sys.error(s">>NOT FOUND ${f.getAbsolutePath}.")
+      pattern.matcher(f.name).find() && f.exists()
     }
+    else false
   }
+}
+
+object SbtDistApp extends AutoPlugin {
 
   import Import._
 
+  val autoImport = Import
+
   override def requires = sbt.plugins.JvmPlugin
 
-  override def trigger = allRequirements
+  override def trigger = noTrigger
 
   override lazy val projectSettings = Seq(
     exportJars := true,
