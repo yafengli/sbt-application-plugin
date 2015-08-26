@@ -35,17 +35,15 @@ Sbt Application Plugin
 #### 使用
 在project/plugins.sbt文件中添加内容：
 
-        addSbtPlugin("org.koala" %% "sbt-application-plugin" % "1.0.0")
+        addSbtPlugin("org.koala" %% "sbt-application-plugin" % "1.1.1")
+        
 在.scala/.sbt中添加类似内容:    
         
         lazy val name = project.in(file".")).enablesPlugin(SbtDistApp).settings(mainClass := Some("demo.Hello"))
 
 #### 配置属性
-+ `.settings(dirSetting ++= Seq("ext"))`配置
-+ `orgination`：组织名称
-+ `name`：项目名称
-+ `version`：版本号
-+ `dirSetting`：打包目录序列`Seq[String]`，缺省值`Seq("bin", "conf","lib")`
++ `mainClass`：定义该配置会在`bin`生成缺省启动脚本，启动脚本缺省以`name`
++ `dirSetting`：打包目录序列`Seq[String]`，缺省值`Seq("bin", "conf","lib")`，额外增加使用`.settings(dirSetting ++= Seq("ext"))`配置
 
 #### 构建发布
 + 打包：`sbt distZip`
