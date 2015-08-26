@@ -1,6 +1,6 @@
 package org.koala.sbt
 
-object SbtAppShell {
+object SbtDistAppShell {
 
   val windows =
     """|@echo off
