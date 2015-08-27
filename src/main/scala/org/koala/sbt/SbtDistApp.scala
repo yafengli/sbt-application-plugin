@@ -12,17 +12,9 @@ object Import {
   val treeDeps = taskKey[Unit]("tree-dependencies.")
   val copyDeps = taskKey[Unit]("copy-dependencies.")
   val hello = taskKey[Unit]("hello.")
-  val pattern = """^.*[^javadoc|^sources]\.jar$""".r.pattern
-  //x.x.x.jar pattern
+  val pattern = """^.*[^javadoc|^sources]\.jar$""".r.pattern //x.x.x.jar pattern
 
-  val filter = (o: Any) => {
-    if (o.isInstanceOf[File]) {
-      val f = o.asInstanceOf[File]
-      if (!f.exists()) sys.error(s">>NOT FOUND ${f.getAbsolutePath}.")
-      pattern.matcher(f.name).find() && f.exists()
-    }
-    else false
-  }
+  val filter: File => Boolean = { f => f.exists() && pattern.matcher(f.name).find() }
 }
 
 object SbtDistApp extends AutoPlugin {
@@ -44,23 +36,35 @@ object SbtDistApp extends AutoPlugin {
         println(s"update:${u} org:${o} name:${n}")
       }
     },
-    distZip <<= (update, crossTarget, dependencyClasspath in Runtime, dirSetting, mainClass, organization, name, version) map {
-      (ur, out, dr, ds, mc, org, name, v) =>
+    distZip <<= (packageBin in Compile, crossTarget, dependencyClasspath in Compile, dirSetting, mainClass, organization, name, version) map {
+      (p, out, dr, ds, mc, org, name, v) =>
         try {
           implicit val buffers = mutable.Buffer[(File, String)]()
           //dependencies jar package jar module dependOn jar
-          (ur.select(Set("compile")) ++ out.listFiles ++ dr.filter(p => p.data.exists() && p.data.isDirectory)
-            .flatMap(_.data.get)).filter(filter).foreach(f => buffers += f -> s"lib/${f.name}")
-          //copy dirSetting files
-          ds.foreach {
-            n =>
-              val d = new File(n)
-              if (d.isDirectory) d.listFiles().foreach(copy(_, d.name)) else buffers += d -> d.name
+          dr.map(_.data).foreach {
+            case f: File if f.isFile && f.name.endsWith(".jar") => buffers += f -> s"lib/${f.name}"
+            case d: File if d.isDirectory =>
+              d.getParentFile.listFiles().filter(filter).headOption match {
+                case Some(f) => buffers += f -> s"lib/${f.name}"
+                case None => println(s":ERR:${d.getParentFile.absolutePath} NOT FOUND JAR FILE.ADD [exportJar := true] TO SETTING.")
+              }
+          }
+          if (out.listFiles() != null && out.listFiles().filter(filter).headOption.isDefined) {
+            val f = out.listFiles().filter(filter).head
+            buffers += f -> s"lib/${f.name}"
+          } else println(s":ERR:${out.absolutePath} NOT FOUND JAR FILE.ADD [exportJar := true] TO SETTING.")
+          //copy dirSetting files.
+          ds.map(new File(_)).foreach {
+            f =>
+              if (f.isDirectory) f.listFiles().foreach(copy(_, f.name)) else buffers += f -> f.name
           }
           //run shell
           if (mc.isDefined) buffers ++= <::((out / s"${name}.bat", SbtDistAppShell.windows, Map('mainClass -> mc.get)), (out / s"${name}", SbtDistAppShell.linux, Map('mainClass -> mc.get)))
 
           val dist = (out / s"../universal/${org}-${name}-${v}.zip")
+
+          //loop buffers
+          //buffers.foreach(t => println(t._1.absolutePath))
 
           IO.zip(buffers, dist)
           IO.unzip(dist, (out / "../universal/stage"))
@@ -99,6 +103,7 @@ object SbtDistApp extends AutoPlugin {
   }
 
   private def writeToFile(f: File, s: String, templates: Map[Symbol, String]): Unit = {
+    if (!f.getParentFile.exists()) f.getParentFile.mkdirs()
     val pw = new java.io.PrintWriter(f)
     f.setExecutable(true)
     try pw.write(replaceTemplates(s, templates)) finally pw.close()
