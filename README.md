@@ -25,7 +25,7 @@ Sbt Application Plugin
 
 #### 安装
 + 发布到本地`Ivy2 Repository`
-        
+
         sbt publishLocal
 
 + 发布到本地`Maven Repository`，修改`build.sbt`:`publishTo := Some(Resolver.file("file",  new File("path/your/m2repo")))`
@@ -36,10 +36,10 @@ Sbt Application Plugin
 在project/plugins.sbt文件中添加内容：
 
         addSbtPlugin("org.koala" %% "sbt-application-plugin" % "1.1.1")
-        
+
 在.scala/.sbt中添加类似内容:    
-        
-        lazy val name = project.in(file".")).enablesPlugin(SbtDistApp).settings(mainClass := Some("demo.Hello"))
+
+        lazy val name = project.in(file(".")).enablePlugins(SbtDistApp).settings(mainClass := Some("demo.Hello"))
 
 #### 配置属性
 + `mainClass`：定义该配置会在`bin`生成缺省启动脚本，启动脚本缺省以`name`
