@@ -31,7 +31,7 @@ lazy val work_1 = project.in(file("work_1")).enablePlugins(SbtDistApp).dependsOn
             case None => println(s":ERR:${d.getParentFile.absolutePath} NOT FOUND JAR FILE.")
           }
       }
-  })
+  }).settings(dirSetting ++= Seq("work_1/ext"))
 
 lazy val work_2 = project.in(file("work_2")).settings(
   exportJars := true,
