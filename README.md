@@ -39,7 +39,7 @@ Sbt Application Plugin
         
 在.scala/.sbt中添加类似内容:    
         
-        lazy val name = project.in(file".")).enablesPlugin(SbtDistApp).settings(mainClass := Some("demo.Hello"))
+        lazy val name = project.in(file".")).enablePlugins(SbtDistApp).settings(mainClass := Some("demo.Hello"))
 
 #### 配置属性
 + `mainClass`：定义该配置会在`bin`生成缺省启动脚本，启动脚本缺省以`name`
