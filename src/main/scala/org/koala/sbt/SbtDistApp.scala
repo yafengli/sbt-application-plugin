@@ -3,7 +3,6 @@ package org.koala.sbt
 import sbt.Keys._
 import sbt._
 
-import scala.annotation.tailrec
 import scala.collection._
 
 object Import {
@@ -11,9 +10,10 @@ object Import {
   val distZip = taskKey[Unit]("dist-zip files.")
   val treeDeps = taskKey[Unit]("tree-dependencies.")
   val copyDeps = taskKey[Unit]("copy-dependencies.")
-  val hello = taskKey[Unit]("hello.")
-  val pattern = """^.*[^javadoc|^sources]\.jar$""".r.pattern //x.x.x.jar pattern
 
+  val defaultDirs = mutable.Buffer("conf", "lib", "bin")
+  val pattern = """^.*[^javadoc|^sources]\.jar$""".r.pattern
+  //x.x.x.jar pattern
   val filter: File => Boolean = { f => f.exists() && pattern.matcher(f.name).find() }
 }
 
@@ -29,13 +29,7 @@ object SbtDistApp extends AutoPlugin {
 
   override lazy val projectSettings = Seq(
     exportJars := true,
-    dirSetting := mutable.Buffer("conf", "lib", "bin"),
-    hello := {
-      println(update.value)
-      (update, organization, name).map { (u, o, n) =>
-        println(s"update:${u} org:${o} name:${n}")
-      }
-    },
+    dirSetting := defaultDirs,
     distZip <<= (packageBin in Compile, crossTarget, dependencyClasspath in Compile, dirSetting, mainClass, organization, name, version) map {
       (p, out, dr, ds, mc, org, name, v) =>
         try {
@@ -54,19 +48,23 @@ object SbtDistApp extends AutoPlugin {
             val f = out.listFiles().filter(filter).head
             map += s"lib/${f.name}" -> f
           } else println(s":ERR:${out.absolutePath} NOT FOUND JAR FILE.ADD [exportJar := true] TO SETTING.")
+
+          //run shell
+          if (mc.isDefined) {
+            val libs = map.values.map(f => f.name)
+            map += SbtDistAppShell.windows(out / s"${name}.bat", libs, mc.get)
+            map += SbtDistAppShell.linux(out / s"${name}", libs, mc.get)
+          }
+
           //copy dirSetting files.
           ds.map(new File(_)).foreach {
             f =>
               if (f.isDirectory) f.listFiles().foreach(copy(_, f.name)) else if (!map.contains(f.name)) map += f.name -> f
           }
-          //run shell
-          if (mc.isDefined) map ++= <<:((out / s"${name}.bat", SbtDistAppShell.windows, Map('mainClass -> mc.get)), (out / s"${name}", SbtDistAppShell.linux, Map('mainClass -> mc.get)))
 
           val dist = (out / s"../universal/${org}-${name}-${v}.zip")
 
-          //loop buffers
-          //map.foreach(t => println(t._2.absolutePath))
-
+          //zip/unzip files
           IO.zip(map.map(e => e._2 -> e._1), dist)
           IO.unzip(dist, (out / "../universal/stage"))
         } catch {
@@ -103,45 +101,7 @@ object SbtDistApp extends AutoPlugin {
     }
   }
 
-  private def writeToFile(f: File, s: String, templates: Map[Symbol, String]): Unit = {
-    if (!f.getParentFile.exists()) f.getParentFile.mkdirs()
-    val pw = new java.io.PrintWriter(f)
-    f.setExecutable(true)
-    try pw.write(replaceTemplates(s, templates)) finally pw.close()
-  }
-
-  private def <<:(ps: (File, String, Map[Symbol, String])*): Map[String, File] = {
-    ps.map {
-      t =>
-        writeToFile(t._1, t._2, t._3)
-        s"bin/${t._1.name}" -> t._1
-    } toMap
-  }
-
   private def path(prefix: String, f: File): String = {
     if (prefix != null && prefix.trim.length > 0) "%s/%s".format(prefix, f.name) else f.name
-  }
-
-  private def replaceTemplates(text: String, templates: Map[Symbol, String]): String = {
-    val builder = new StringBuilder(text)
-    @tailrec
-    def loop(key: String,
-             keyLength: Int,
-             value: String): StringBuilder = {
-      val index = builder.lastIndexOf(key)
-      if (index < 0) builder
-      else {
-        builder.replace(index, index + keyLength, value)
-        loop(key, keyLength, value)
-      }
-    }
-
-    templates.foreach {
-      case (key, value) =>
-        val template = "${" + key.name + "}"
-        loop(template, template.length, value)
-    }
-
-    builder.toString()
   }
 }

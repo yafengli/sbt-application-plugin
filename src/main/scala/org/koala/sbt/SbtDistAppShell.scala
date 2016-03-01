@@ -1,25 +1,45 @@
 package org.koala.sbt
 
+import sbt._
+
 object SbtDistAppShell {
 
-  val windows =
-    """|@echo off
-      |setlocal enabledelayedexpansion
+  def windows(f: File, libs: Iterable[String], mainClass: String): (String, File) = {
+    val libStr = libs.map("%LIB_PATH%/" + _).mkString(";")
+    val cmd =
+      s"""|@echo off
+          |set LIB_PATH=lib
+          |
+          |set APP_CP=${libStr}
+          |
+          |java -cp %APP_CP% ${mainClass} %*
+      """.stripMargin.replaceAll("\\r\\n", "\n")
+    writeToFile(f) { w => w.write(cmd) }
+    "bin/" + f.name -> f
+  }
 
-      |for %%a in ("lib\*.jar") do set APP_CP=!APP_CP!%%a;
 
-      |java -cp %APP_CP% ${mainClass} %*
-      |@echo on""".stripMargin
+  def linux(f: File, libs: Iterable[String], mainClass: String): (String, File) = {
+    val libStr = libs.map("$LIB_PATH/" + _).mkString(":")
+    val cmd =
+      (s"""|#!/bin/sh
+           |LIB_PATH=lib
+           |
+           |APP_CP=${libStr}
+           |
+           |java -cp """.stripMargin + "$APP_CP " + s"${mainClass} " + "$*").replaceAll("\\r\\n", "\n")
 
-  val linux =
-    """|#!/bin/sh
-      |PRG="$0"
+    writeToFile(f) { w => w.write(cmd) }
+    "bin/" + f.name -> f
+  }
 
-      |APP_HOME=`dirname "$PRG"`
-
-      |APP_HOME=`cd "$APP_HOME"/.. ; pwd`
-
-      |APP_CP=`ls lib/*.jar | sed ':a;N;$!ba;s/\\n/:/g'`
-
-      |java -cp $APP_CP ${mainClass} $*""".stripMargin.replaceAll("\\r\\n", "\n")
+  def writeToFile(f: java.io.File)(op: java.io.PrintWriter => Unit) {
+    if (!f.getParentFile.exists()) f.getParentFile.mkdirs()
+    val p = new java.io.PrintWriter(f)
+    try {
+      op(p)
+    } finally {
+      p.close()
+    }
+  }
 }
