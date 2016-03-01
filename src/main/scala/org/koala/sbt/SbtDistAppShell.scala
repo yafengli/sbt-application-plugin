@@ -12,8 +12,7 @@ object SbtDistAppShell {
           |
           |set APP_CP=${libStr}
           |
-          |java -cp %APP_CP% ${mainClass} %*
-      """.stripMargin.replaceAll("\\r\\n", "\n")
+          |java -cp %APP_CP% ${mainClass} %*""".stripMargin.replaceAll("\\r\\n", "\n")
     writeToFile(f) { w => w.write(cmd) }
     "bin/" + f.name -> f
   }
