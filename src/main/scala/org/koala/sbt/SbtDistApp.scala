@@ -59,8 +59,7 @@ object SbtDistApp extends AutoPlugin {
           //copy dirSetting files.
           ds.map(new File(_)).foreach {
             f =>
-
-              if (f.isDirectory) f.listFiles().foreach(copy(_, f.name)) else if (!map.contains(f.name)) map += path(f.getParentFile.name, f) -> f
+              if (f.isDirectory) f.listFiles().foreach(copy(_, f.name)) else if (!map.contains(f.name)) map += path(f.getAbsoluteFile.getParentFile.getName, f) -> f
           }
 
           val dist = (out / s"../universal/${org}-${name}-${v}.zip")
