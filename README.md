@@ -43,7 +43,7 @@ Sbt Application Plugin
 
 #### 配置属性
 + `mainClass`：定义该配置会在`bin`生成缺省启动脚本，启动脚本缺省以`name`
-+ `dirSetting`：打包目录序列`Seq[String]`，缺省值`Seq("bin", "conf","lib")`，额外增加使用`.settings(dirSetting ++= Seq("ext"))`配置
++ `dirSetting`：打包目录序列`Seq[String]`，缺省值`Seq("lib")`，额外增加使用`.settings(dirSetting ++= Seq("conf","bin"))`配置
 
 #### 构建发布
 + 打包：`sbt distZip`

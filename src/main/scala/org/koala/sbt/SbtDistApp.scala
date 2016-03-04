@@ -11,7 +11,7 @@ object Import {
   val treeDeps = taskKey[Unit]("tree-dependencies.")
   val copyDeps = taskKey[Unit]("copy-dependencies.")
 
-  val defaultDirs = mutable.Buffer("conf", "lib", "bin")
+  val defaultDirs = mutable.Buffer("lib")
   val pattern = """^.*[^javadoc|^sources]\.jar$""".r.pattern
   //x.x.x.jar pattern
   val filter: File => Boolean = { f => f.exists() && pattern.matcher(f.name).find() }
@@ -59,7 +59,8 @@ object SbtDistApp extends AutoPlugin {
           //copy dirSetting files.
           ds.map(new File(_)).foreach {
             f =>
-              if (f.isDirectory) f.listFiles().foreach(copy(_, f.name)) else if (!map.contains(f.name)) map += f.name -> f
+
+              if (f.isDirectory) f.listFiles().foreach(copy(_, f.name)) else if (!map.contains(f.name)) map += path(f.getParentFile.name, f) -> f
           }
 
           val dist = (out / s"../universal/${org}-${name}-${v}.zip")
