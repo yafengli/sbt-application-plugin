@@ -19,37 +19,38 @@ Sbt Application Plugin
 
 打包后的应用目录结构类似：
 
-        ├─*       //bin目录下的执行脚本
+        ├─bin/*   //bin目录下的执行脚本
         ├─conf    //conf目录下的配置
         ├─lib     //所有依赖的库(jar)
 
 #### 安装
-        
-       	cd sbt-application-plugin
++ 发布到本地`Ivy2 Repository`
 
-+ 发布到本地Ivy2 Repository       	
-        
         sbt publishLocal
 
 + 发布到本地`Maven Repository`，修改`build.sbt`:`publishTo := Some(Resolver.file("file",  new File("path/your/m2repo")))`
 
-				sbt publish
+        sbt publish
 
 #### 使用
 在project/plugins.sbt文件中添加内容：
 
-        addSbtPlugin("org.koala" %% "sbt-application-plugin" % "1.0.0")
+        addSbtPlugin("org.koala" %% "sbt-application-plugin" % "1.1.1")
+
 在.scala/.sbt中添加类似内容:    
-        
-        import org.koala.sbt.SbtAppPlugin._
 
-    	lazy val name = project.in(file".")).settings(appSettings : _*).settings(prefix := "test",dirSetting ++= Seq("ext" -> "ext_dir"))
+        lazy val name = project.in(file(".")).enablePlugins(SbtDistApp).settings(mainClass := Some("demo.Hello"))
 
-#### 配置
-需要配置两个参数：
-+ `prefix`：打包文件名前缀，缺省为`organization-name-version`；
-+ `dirSetting`：打包包含文件路径`Map`，`key`为包含的目录，`value`为打包文件的目录，缺省值`Map("conf" -> "conf", "bin" -> "","lib" -> "lib")`；
+#### 配置属性
++ `mainClass`：定义该配置会在`bin`生成缺省启动脚本，启动脚本缺省以`name`
++ `dirSetting`：打包目录序列`Seq[String]`，缺省值`Seq("lib")`，额外增加使用`.settings(dirSetting ++= Seq("conf","bin"))`配置
 
-#### 命令
+#### 构建发布
++ 打包：`sbt distZip`
++ 生成文件`target/universal/[orgination]-[name]-[version].zip`
 
-        sbt dist-zip
+#### 运行
+
+        unzip [orgination]-[name]-[version].zip
+        bin/[name].bat                          //Windows
+        chmod 777 bin/[name] && bin/[name]      //Linux

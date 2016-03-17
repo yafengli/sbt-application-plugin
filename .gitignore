@@ -4,3 +4,5 @@ project/project
 .project
 *.iml
 .idea*
+.ensime
+.ensime_cache/
