@@ -8,11 +8,13 @@ object SbtDistAppShell {
     val libStr = libs.map("%LIB_PATH%/" + _).mkString(";")
     val cmd =
       s"""|@echo off
+          |@rem set JAVA_OPTS
+          |
           |set LIB_PATH=lib
           |
           |set APP_CP=${libStr}
           |
-          |java -cp %APP_CP% ${mainClass} %*""".stripMargin.replaceAll("\\r\\n", "\n")
+          |java %JAVA_OPTS% -cp %APP_CP% ${mainClass} %*""".stripMargin.replaceAll("\\r\\n", "\n")
     writeToFile(f) { w => w.write(cmd) }
     "bin/" + f.name -> f
   }
@@ -22,11 +24,13 @@ object SbtDistAppShell {
     val libStr = libs.map("$LIB_PATH/" + _).mkString(":")
     val cmd =
       (s"""|#!/bin/sh
+           |#set JAVA_OPTS
+           |
            |LIB_PATH=lib
            |
            |APP_CP=${libStr}
            |
-           |java -cp """.stripMargin + "$APP_CP " + s"${mainClass} " + "$*").replaceAll("\\r\\n", "\n")
+           |java """.stripMargin + "$JAVA_OPTS -cp $APP_CP " + s"${mainClass} " + "$*").replaceAll("\\r\\n", "\n")
 
     writeToFile(f) { w => w.write(cmd) }
     "bin/" + f.name -> f
