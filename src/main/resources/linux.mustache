@@ -1,0 +1,16 @@
+#!/bin/bash
+#setting
+JAVA_OPTS=""
+
+#common variable
+PWD=$(cd `dirname $0`; cd ..; pwd)
+APP_CP=.
+
+for f in $(find ${PWD}/lib -name *.jar);do
+   APP_CP=$APP_CP:$f
+done
+
+CLASSPATH=$CLASSPATH:$APP_CP
+export CLASSPATH
+
+$JAVA_HOME/bin/java $JAVA_OPTS {{mainClass}} $*
