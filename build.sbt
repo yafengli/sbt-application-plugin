@@ -4,7 +4,7 @@ name := "sbt-application-plugin"
 
 organization := "org.koala"
 
-version := "1.1.1"
+version := $("prod")
 
 scalaVersion := "2.10.5"
 

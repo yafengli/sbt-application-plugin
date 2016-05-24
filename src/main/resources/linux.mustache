@@ -4,12 +4,13 @@ JAVA_OPTS=""
 
 #common variable
 PWD=$(cd `dirname $0`; cd ..; pwd)
-APP_CP=.
 
-for f in $(find ${PWD}/lib -name *.jar);do
-   APP_CP=$APP_CP:$f
-done
+#APP_CP=.
+#for f in $(find ${PWD}/lib -name *.jar);do
+#   APP_CP=$APP_CP:$f
+#done
 
+APP_CP={{libStr}}
 CLASSPATH=$CLASSPATH:$APP_CP
 export CLASSPATH
 
