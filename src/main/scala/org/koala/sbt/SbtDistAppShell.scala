@@ -11,7 +11,7 @@ object SbtDistAppShell {
   def windows(f: File, libs: Iterable[String], mainClass: String): (String, File) = {
     val scopes = new util.HashMap[String, Object]()
     scopes.put("mainClass", mainClass)
-    scopes.put("libStr", libs.map("%LIB_PATH%/" + _).mkString(";"))
+    scopes.put("libStr", libs.map("lib/" + _).mkString(";"))
 
     writeToFile(f) { w =>
       mustache(w)("windows.mustache", scopes)
@@ -23,7 +23,7 @@ object SbtDistAppShell {
   def linux(f: File, libs: Iterable[String], mainClass: String): (String, File) = {
     val scopes = new util.HashMap[String, Object]()
     scopes.put("mainClass", mainClass)
-    scopes.put("libStr", libs.map("${LIB_PATH}/" + _).mkString(":"))
+    scopes.put("libStr", libs.map("lib/" + _).mkString(":"))
 
     writeToFile(f) { w =>
       mustache(w)("linux.mustache", scopes)
