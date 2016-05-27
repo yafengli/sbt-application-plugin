@@ -3,7 +3,7 @@ package org.koala.sbt
 import java.io.{InputStreamReader, PrintWriter}
 import java.util
 
-import com.github.mustachejava.DefaultMustacheFactory
+import com.samskivert.mustache.Mustache
 import sbt._
 
 object SbtDistAppShell {
@@ -45,10 +45,10 @@ object SbtDistAppShell {
   def mustache(w: PrintWriter)(resourceTemplateName: String, scopes: util.HashMap[String, Object]): Unit = {
     val reader = new InputStreamReader(this.getClass.getClassLoader.getResourceAsStream(resourceTemplateName))
     try {
-      val mf = new DefaultMustacheFactory()
-      val mustache = mf.compile(reader, null)
+      val mc = Mustache.compiler()
+      val mustache = mc.compile(reader)
 
-      mustache.execute(w, scopes).flush()
+      mustache.execute(scopes,w)
     } catch {
       case e: Exception => e.printStackTrace()
     } finally {

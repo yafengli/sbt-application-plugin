@@ -11,6 +11,6 @@ scalaVersion := "2.10.5"
 sbtPlugin := true
 
 libraryDependencies ++= Seq(
-  "com.github.spullara.mustache.java" % "compiler" % $("mustache.java"),
+  "com.samskivert" % "jmustache" % $("jmustache"),
   "org.scalatest" %% "scalatest" % $("scalatest") % "test",
   "junit" % "junit" % $("junit") % "test")
