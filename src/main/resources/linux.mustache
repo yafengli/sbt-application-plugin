@@ -1,6 +1,9 @@
 #!/bin/bash
-#setting
-JAVA_OPTS="-server"
+
+if [ -z $JAVA_OPTS ];then 
+    echo "JAVA_OPTS not set. eg.[JAVA_OPTS=-server -Dfile.encoding=utf-8]"
+fi
+
 LIB_PATH=lib
 #common variable
 PWD=$(cd `dirname $0`; cd ..; pwd)

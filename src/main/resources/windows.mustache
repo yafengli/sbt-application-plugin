@@ -1,6 +1,6 @@
 @echo off
 
-set JAVA_OPTS="-server"
+if "%JAVA_OPTS%" == "" echo "JAVA_OPTS not set. eg.[SET JAVA_OPTS=-server -Dfile.encoding=utf-8]"
 
 set APP_CP=.;{{libStr}}
 
