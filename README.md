@@ -35,7 +35,7 @@ Sbt Application Plugin
 #### 使用
 在project/plugins.sbt文件中添加内容：
 
-        addSbtPlugin("org.koala" %% "sbt-application-plugin" % "1.1.2")
+        addSbtPlugin("org.koala" %% "sbt-application-plugin" % "x.y.z")
 
 在.scala/.sbt中添加类似内容:    
 
