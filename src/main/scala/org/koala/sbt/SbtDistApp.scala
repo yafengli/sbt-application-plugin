@@ -31,7 +31,7 @@ object SbtDistApp extends AutoPlugin {
     exportJars := true,
     dirSetting := defaultDirs,
     distZip := {
-      val (out, dr, ds, mc, org, v) = (crossTarget.value, dependencyClasspath.in(Compile).value, dirSetting.value, mainClass.value, organization.value, version.value)
+      val (_, out, dr, ds, mc, org, v) = (packageBin.in(Compile), crossTarget.value, dependencyClasspath.in(Compile).value, dirSetting.value, mainClass.value, organization.value, version.value)
       try {
         implicit val map = mutable.HashMap[String, File]()
 
@@ -47,7 +47,7 @@ object SbtDistApp extends AutoPlugin {
         if (out.listFiles() != null && out.listFiles().filter(filter).headOption.isDefined) {
           val f = out.listFiles().filter(filter).head
           map += s"lib/${f.name}" -> f
-        } else println(s":ERR:${out.absolutePath} NOT FOUND JAR FILE.ADD [exportJar := true] TO SETTING.")
+        } else println(s":ERR:${out.absolutePath} NOT FOUND JAR FILE.ADD [exportJars := true] TO SETTING.")
 
         //run shell
         if (mc.isDefined) {
@@ -62,7 +62,7 @@ object SbtDistApp extends AutoPlugin {
             if (f.isDirectory) f.listFiles().foreach(copy(_, f.name)) else if (!map.contains(f.name)) map += path(f.getAbsoluteFile.getParentFile.getName, f) -> f
         }
 
-        val dist = (out / s"../universal/${org}-${name}-${v}.zip")
+        val dist = (out / s"../universal/${org}-${name.value}-${v}.zip")
 
         //zip/unzip files
         IO.zip(map.map(e => e._2 -> e._1), dist)
