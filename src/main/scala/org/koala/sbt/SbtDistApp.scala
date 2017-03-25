@@ -6,10 +6,10 @@ import sbt._
 import scala.collection._
 
 object Import {
-  val dirSetting = settingKey[Seq[String]]("dir-setting")
-  val distZip = taskKey[Unit]("dist-zip files.")
-  val treeDeps = taskKey[Unit]("tree-dependencies.")
-  val copyDeps = taskKey[Unit]("copy-dependencies.")
+  val dirSetting = settingKey[Seq[String]]("dirSetting")
+  val distZip = taskKey[Unit]("distZip")
+  val treeDeps = taskKey[Unit]("treeDependencies.")
+  val copyDeps = taskKey[Unit]("copyDependencies.")
 
   val defaultDirs = mutable.Buffer("lib")
   val pattern = """^.*[^javadoc|^sources]\.jar$""".r.pattern
