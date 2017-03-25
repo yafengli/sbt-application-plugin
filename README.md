@@ -46,7 +46,7 @@ Sbt Application Plugin
 + `dirSetting`：打包目录序列`Seq[String]`，缺省值`Seq("lib")`，额外增加使用`.settings(dirSetting ++= Seq("conf","bin"))`配置
 
 #### 构建发布
-+ 打包：`sbt distZip`
++ 打包：`sbt package distZip`
 + 生成文件`target/universal/[orgination]-[name]-[version].zip`
 
 #### 运行

@@ -31,7 +31,7 @@ object SbtDistApp extends AutoPlugin {
     exportJars := true,
     dirSetting := defaultDirs,
     distZip := {
-      val (_, out, dr, ds, mc, org, v) = (packageBin.in(Compile), crossTarget.value, dependencyClasspath.in(Compile).value, dirSetting.value, mainClass.value, organization.value, version.value)
+      val (out, dr, ds, mc, org, v) = (crossTarget.value, dependencyClasspath.in(Compile).value, dirSetting.value, mainClass.value, organization.value, version.value)
       try {
         implicit val map = mutable.HashMap[String, File]()
 
