@@ -21,17 +21,17 @@ lazy val work_1 = project.in(file("work_1")).enablePlugins(SbtDistApp).dependsOn
     "com.typesafe.akka" %% "akka-kernel" % "2.3.12",
     "com.typesafe.akka" %% "akka-remote" % "2.3.12"
   ),
-  list <<= (update, dependencyClasspath in Compile) map {
-    (u, dr) =>
-      dr.map(_.data).foreach {
-        case f: File if f.isFile && f.name.endsWith(".jar") => println(f">:${f.absolutePath}")
-        case d: File if d.isDirectory =>
-          d.getParentFile.listFiles().filter(filter).headOption match {
-            case Some(file) => println(s">[project]>${file.absolutePath}")
-            case None => println(s":ERR:${d.getParentFile.absolutePath} NOT FOUND JAR FILE.")
-          }
-      }
-  }).settings(dirSetting ++= Seq("work_1/extii/hello.conf","work_1/ext"))
+  list := {
+    val (u, dr) = (update.value, dependencyClasspath.in(Compile).value)
+    dr.map(_.data).foreach {
+      case f: File if f.isFile && f.name.endsWith(".jar") => println(f">:${f.absolutePath}")
+      case d: File if d.isDirectory =>
+        d.getParentFile.listFiles().filter(filter).headOption match {
+          case Some(file) => println(s">[project]>${file.absolutePath}")
+          case None => println(s":ERR:${d.getParentFile.absolutePath} NOT FOUND JAR FILE.")
+        }
+    }
+  }).settings(dirSetting ++= Seq("work_1/extii/hello.conf", "work_1/ext"))
 
 lazy val work_2 = project.in(file("work_2")).settings(
   exportJars := true,

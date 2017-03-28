@@ -1,45 +1,37 @@
 Sbt Application Plugin
 ===========
+`Sbt Application Plugin`是`SBT`构建工具的一个插件，主要目标是为简单的应用打包。
 
-#### 简介
-`Sbt Application Plugin`是`SBT`构建工具的一个插件，主要目标是为简单的应用打包，项目目录类似：
-
-        ├─bin                         //执行脚本
-        ├─conf                        //应用配置
-        ├─project                     //sbt配置
-        ├─src                         //源文件目录
-        │ ├─main
-        │ │ ├─java
-        │ │ ├─resources
-        │ │ └─scala   
-        │ └─test
-        │     ├─java
-        │     └─scala
-        └─target
-
-打包后的应用目录结构类似：
+#### 打包目录
 
         ├─bin/*   //bin目录下的执行脚本
         ├─conf    //conf目录下的配置
         ├─lib     //所有依赖的库(jar)
 
-#### 安装
+#### 编译安装
++ 下载`git clone git@github.com:yafengli/sbt-application-plugin.git`
+
 + 发布到本地`Ivy2 Repository`
 
+        cd sbt-application-plugin
         sbt publishLocal
 
-+ 发布到本地`Maven Repository`，修改`build.sbt`:`publishTo := Some(Resolver.file("file",  new File("path/your/m2repo")))`
++ 发布到本地`Maven Repository`
 
-        sbt publish
+        sbt publishM2
+        
++ 特定仓库发布，修改`build.sbt`:`publishTo := Some(Resolver.file("file",  new File("path/your/m2repo")))`     
 
+        sbt publish       
+       
 #### 使用
-在project/plugins.sbt文件中添加内容：
+在使用`SBT`的项目中，修改`project/plugins.sbt`文件中内容：
 
-        addSbtPlugin("org.koala" %% "sbt-application-plugin" % "x.y.z")
+        addSbtPlugin("org.koala" %% "sbt-application-plugin" % "[x.y.z]")
 
-在.scala/.sbt中添加类似内容:    
+在构建脚本`build.sbt`中添加内容:    
 
-        lazy val name = project.in(file(".")).enablePlugins(SbtDistApp).settings(mainClass := Some("demo.Hello"))
+        lazy val name = project.in(file(".")).enablePlugins(SbtDistApp).settings(mainClass := Some("[demo.class.name]"))
 
 #### 配置属性
 + `mainClass`：定义该配置会在`bin`生成缺省启动脚本，启动脚本缺省以`name`

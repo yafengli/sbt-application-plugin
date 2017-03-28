@@ -31,24 +31,19 @@ object SbtDistApp extends AutoPlugin {
     exportJars := true,
     dirSetting := defaultDirs,
     distZip := {
+      val pv = packageBin.in(Compile).value
+      println(s"pv:${pv.getAbsolutePath}")
       val (out, dr, ds, mc, org, v, suffix) = (crossTarget.value, dependencyClasspath.in(Compile).value, dirSetting.value, mainClass.value, organization.value, version.value, name.value)
       try {
         implicit val map = mutable.HashMap[String, File]()
 
         //dependencies jar package jar module dependOn jar
         dr.map(_.data).foreach {
-          case f: File if f.isFile && f.name.endsWith(".jar") => map += s"lib/${f.name}" -> f
-          case d: File if d.isDirectory =>
-            d.getParentFile.listFiles().filter(filter).headOption match {
-              case Some(f) => map += s"lib/${f.name}" -> f
-              case None => println(s":ERR:${d.getParentFile.absolutePath} NOT FOUND JAR FILE.ADD [exportJars := true] TO SETTING.")
-            }
+          case f: File if f.isFile && f.name.endsWith(".jar") => inject(map, s"lib/${f.name}", f)
+          case d: File if d.isDirectory => d.getParentFile.listFiles().filter(filter).headOption.foreach(f => inject(map, s"lib/${f.name}", f))
         }
-        if (out.listFiles() != null && out.listFiles().filter(filter).headOption.isDefined) {
-          val f = out.listFiles().filter(filter).head
-          map += s"lib/${f.name}" -> f
-        } else println(s":ERR:${out.absolutePath} NOT FOUND JAR FILE.ADD [exportJars := true] TO SETTING.")
-
+        //package jar
+        out.listFiles().filter(filter).headOption.foreach(f => inject(map, s"lib/${f.name}", f))
         //run shell
         if (mc.isDefined) {
           val libs = map.values.map(f => f.name)
@@ -59,7 +54,7 @@ object SbtDistApp extends AutoPlugin {
         //copy dirSetting files.
         ds.map(new File(_)).foreach {
           f =>
-            if (f.isDirectory) f.listFiles().foreach(copy(_, f.name)) else if (!map.contains(f.name)) map += path(f.getAbsoluteFile.getParentFile.getName, f) -> f
+            if (f.isDirectory) f.listFiles().foreach(copy(_, f.name)) else if (!map.contains(f.name)) inject(map, path(f.getAbsoluteFile.getParentFile.getName, f), f)
         }
 
         val dist = (out / s"../universal/${org}-${suffix}-${v}.zip")
@@ -85,14 +80,18 @@ object SbtDistApp extends AutoPlugin {
     treeDeps := {
       val (u, d) = (update.value, dependencyClasspath.in(Runtime).value)
       u.allFiles.foreach(f => println(f.getAbsolutePath))
-      println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
       d.foreach(f => println(f.data.getAbsolutePath))
     })
+
+  def inject(map: mutable.HashMap[String, File], key: String, f: File): Unit = {
+    println(s"Including......${f.getName}")
+    map += key -> f
+  }
 
   def copy(file: File, prefix: String)(implicit map: mutable.HashMap[String, File]): Unit = {
     try {
       file match {
-        case f: File if f.isFile => map += path(prefix, f) -> f
+        case f: File if f.isFile => inject(map, path(prefix, f), f)
         case d: File if d.isDirectory => d.listFiles().foreach(f => copy(f, path(prefix, d)))
         case _ =>
       }
