@@ -1,0 +1,14 @@
+@echo off
+setlocal enabledelayedexpansion
+@rem 基础路径
+cd %~dp0
+cd ..
+
+@rem classpath设置
+SET APP_CP=.
+@REM for %%i in ("lib\*.*") do (echo %%i)
+for %%i in ("lib\*.*") do (set APP_CP=!APP_CP!;%%i)
+
+if "%JAVA_OPTS%" == "" echo "JAVA_OPTS not set. eg.[SET JAVA_OPTS=-server -Dfile.encoding=utf-8]"
+
+%JAVA_HOME%/bin/java %JAVA_OPTS% -cp %APP_CP% {{mainClass}} %*
