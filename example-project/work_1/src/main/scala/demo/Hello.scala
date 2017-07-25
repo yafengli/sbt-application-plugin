@@ -1,6 +1,6 @@
 
 package demo
 
-object HelloI extends App {
+object Hello extends App {
 	println("Hello World!")
 }
