@@ -7,14 +7,18 @@ fi
 LIB_PATH=lib
 #common variable
 PWD=$(cd `dirname $0`; cd ..; pwd)
+cd $PWD
 
-#APP_CP=.
-#for f in $(find ${PWD}/lib -name *.jar);do
-#   APP_CP=$APP_CP:$f
-#done
+#APP_CP=.:{{libStr}}
+APP_CP=.
+for f in $(find ${PWD}/lib -name *.jar);do
+   APP_CP=$APP_CP:$f
+done
 
-APP_CP=.:{{libStr}}
+JAVA_HOME=$JAVA_HOME
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=$CLASSPATH:$APP_CP
 CLASSPATH=$APP_CP
 export CLASSPATH
 
-$JAVA_HOME/bin/java $JAVA_OPTS -cp $APP_CP {{mainClass}} $*
+java $JAVA_OPTS {{mainClass}} $*

@@ -4,6 +4,8 @@ if "%JAVA_OPTS%" == "" echo "JAVA_OPTS not set. eg.[SET JAVA_OPTS=-server -Dfile
 
 set APP_CP=.;{{libStr}}
 
+set JAVA_HOME=%JAVA_HOME%
+set PATH=%JAVA_HOME%/bin;%PATH%
 set CLASSPATH=%APP_CP%
 
-%JAVA_HOME%/bin/java %JAVA_OPTS% -cp %APP_CP% {{mainClass}} %*
+java %JAVA_OPTS% {{mainClass}} %*
