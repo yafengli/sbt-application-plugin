@@ -1,3 +1,5 @@
+import Build._
+
 val list = taskKey[Unit]("list")
 
 val filter = (o: Any) => {
@@ -14,12 +16,11 @@ lazy val root = project.in(file(".")).aggregate(work_1, work_2)
 lazy val work_1 = project.in(file("work_1")).enablePlugins(SbtDistApp).dependsOn(work_2).settings(
   name := "work_1",
   organization := "org.koala",
-  version := "1.1.0",
-  scalaVersion := "2.11.6",
+  version := $("prod"),
+  scalaVersion := $("scalaApp"),
   mainClass := Some("demo.Hello"),
   libraryDependencies ++= Seq(
-    "com.typesafe.akka" %% "akka-kernel" % "2.3.12",
-    "com.typesafe.akka" %% "akka-remote" % "2.3.12"
+    "com.typesafe.akka" %% "akka-remote" % $("akka")
   ),
   list := {
     val (u, dr) = (update.value, dependencyClasspath.in(Compile).value)
@@ -37,10 +38,10 @@ lazy val work_2 = project.in(file("work_2")).settings(
   exportJars := true,
   name := "work_2",
   organization := "org.koala",
-  version := "1.1.0",
-  scalaVersion := "2.11.6",
+  version := $("prod"),
+  scalaVersion := $("scalaApp"),
   mainClass := Some("demo.Hello"),
   libraryDependencies ++= Seq(
-    "com.typesafe.slick" %% "slick" % "3.0.2",
-    "com.typesafe.slick" %% "slick-codegen" % "3.0.2"
+    "com.typesafe.slick" %% "slick" % $("slick"),
+    "com.typesafe.slick" %% "slick-codegen" % $("slick")
   ))

@@ -1,24 +1,23 @@
 #!/bin/bash
 
-if [ -z $JAVA_OPTS ];then 
+#check envriment
+if [ -z "$JAVA_OPTS" ];then 
     echo "JAVA_OPTS not set. eg.[export JAVA_OPTS='-server -Dfile.encoding=utf-8']"
 fi
 
-LIB_PATH=lib
 #common variable
 PWD=$(cd `dirname $0`; cd ..; pwd)
 cd $PWD
 
+#loop classpath libraries
+LIB_PATH=lib
 #APP_CP=.:{{libStr}}
 APP_CP=.
 for f in $(find ${PWD}/lib -name *.jar);do
    APP_CP=$APP_CP:$f
 done
 
-JAVA_HOME=$JAVA_HOME
 export PATH=$JAVA_HOME/bin:$PATH
 export CLASSPATH=$CLASSPATH:$APP_CP
-CLASSPATH=$APP_CP
-export CLASSPATH
 
 java $JAVA_OPTS {{mainClass}} $*

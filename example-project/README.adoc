@@ -1,0 +1,8 @@
+==== 测试
+
+[source,shell]
+----
+sbt
+>project work_1
+>distZip
+----
