@@ -6,7 +6,7 @@ organization := "org.koala"
 
 version := $("prod")
 
-scalaVersion := $("scalaPlugin")
+scalaVersion := $("scala")
 
 sbtPlugin := true
 

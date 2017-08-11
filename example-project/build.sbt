@@ -17,7 +17,7 @@ lazy val work_1 = project.in(file("work_1")).enablePlugins(SbtDistApp).dependsOn
   name := "work_1",
   organization := "org.koala",
   version := $("prod"),
-  scalaVersion := $("scalaApp"),
+  scalaVersion := $("scala"),
   mainClass := Some("demo.Hello"),
   libraryDependencies ++= Seq(
     "com.typesafe.akka" %% "akka-remote" % $("akka")
@@ -39,7 +39,7 @@ lazy val work_2 = project.in(file("work_2")).settings(
   name := "work_2",
   organization := "org.koala",
   version := $("prod"),
-  scalaVersion := $("scalaApp"),
+  scalaVersion := $("scala"),
   mainClass := Some("demo.Hello"),
   libraryDependencies ++= Seq(
     "com.typesafe.slick" %% "slick" % $("slick"),
