@@ -14,15 +14,18 @@ Sbt Application Plugin
 + 发布到本地`Ivy2 Repository`
 
         cd sbt-application-plugin
-        sbt publishLocal
+        sbt 
+        > ^ publishLocal     // cross build for sbt(0.13.16, 1.0.2)
 
 + 发布到本地`Maven Repository`
 
-        sbt publishM2
+        sbt 
+        > ^ publishM2
         
 + 特定仓库发布，修改`build.sbt`:`publishTo := Some(Resolver.file("file",  new File("path/your/m2repo")))`     
 
-        sbt publish       
+        sbt 
+        > ^ publish       
        
 #### 使用
 在使用`SBT`的项目中，修改`project/plugins.sbt`文件中内容：

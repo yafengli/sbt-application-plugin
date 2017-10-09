@@ -8,37 +8,27 @@ version := $("prod")
 
 sbtPlugin := true
 
-crossSbtVersions := Seq("0.13.16","1.0.1")
+scalaVersion := $("scala")
 
-// scalaVersion := {
-//    CrossVersion.binarySbtVersion(sbtVersion.value) match {
-//     case "1.0" => "2.12.3"
-//     case _ => "2.10.6"
-//   }
-// }
+sbtVersion in Global := "1.0.2"
 
-libraryDependencies ++= {
-   CrossVersion.binarySbtVersion(sbtVersion.value) match {
-    case "1.0" => Seq("org.scala-sbt" %% "scripted-sbt" % sbtVersion.value)
-    case _ => Seq("org.scala-sbt" % "scripted-sbt" % sbtVersion.value)
-  }
-}
+crossSbtVersions := Seq("0.13.16","1.0.2")
 
 libraryDependencies ++= Seq(  
   "com.samskivert" % "jmustache" % $("jmustache"),
   "org.scalatest" %% "scalatest" % $("scalatest") % "test",
-  "junit" % "junit" % $("junit") % "test")
+  "junit" % "junit" % $("junit") % "test") ++ {
+  val currentSbtVersion = (sbtVersion in pluginCrossBuild).value
+  if(currentSbtVersion.startsWith("1.0"))
+    Seq("org.scala-lang" % "scala-library" % scalaVersion.value, "org.scala-sbt" %% "scripted-sbt" % sbtVersion.value)
+  else Seq()
+}
 
 lazy val testTask = TaskKey[Unit]("lyfHello")
 
 testTask := {
-  CrossVersion.binarySbtVersion(sbtVersion.value) match {
-    case "0.13" =>
-      println("0.13:"+sbtVersion.value)
-    case t:String =>      
-      println(t)
-      Seq(        
-        println("1.0.1:"+sbtVersion.value)
-      )
-  }
+  println("Usage: ^ lyfHello")
+  val currentSbtVersion = (sbtVersion in pluginCrossBuild).value
+  if(currentSbtVersion.startsWith("1.0")) println("1.0:"+currentSbtVersion)
+  else println("0.13:"+currentSbtVersion)
 }
