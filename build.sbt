@@ -1,5 +1,7 @@
 import Build._
 
+licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
+
 name := "sbt-application-plugin"
 
 organization := "org.koala"
