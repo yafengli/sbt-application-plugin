@@ -4,7 +4,7 @@ Sbt Application Plugin
 
 #### 打包目录
 
-        ├─bin/*   //bin目录下的执行脚本
+        ├─bin/*   //bin 目录下的脚本
         ├─conf    //conf目录下的配置
         ├─lib     //所有依赖的库(jar)
 
@@ -15,7 +15,7 @@ Sbt Application Plugin
 
         cd sbt-application-plugin
         sbt 
-        > ^ publishLocal     // cross build for sbt(0.13.16, 1.0.2)
+        > ^ publishLocal     // cross build for sbt(0.13.15+, 1.0.0+)
 
 + 发布到本地`Maven Repository`
 
@@ -34,14 +34,16 @@ Sbt Application Plugin
 
 在构建脚本`build.sbt`中添加内容:    
 
-        lazy val name = project.in(file(".")).enablePlugins(SbtDistApp).settings(mainClass := Some("[demo.class.name]"))
+        lazy val name = project.in(file(".")).enablePlugins(SbtDistApp)
+                                             .settings(mainClass := Some("[demo.class.name]"))
+                                             .settings(dirSetting ++= Seq("conf","bin"))
 
 #### 配置属性
 + `mainClass`：定义该配置会在`bin`生成缺省启动脚本，启动脚本缺省以`name`
-+ `dirSetting`：打包目录序列`Seq[String]`，缺省值`Seq("lib")`，额外增加使用`.settings(dirSetting ++= Seq("conf","bin"))`配置
++ `dirSetting`：需要额外打包的相对目录名`Seq[String]`
 
 #### 构建发布
-+ 打包：`sbt package distZip`
++ 打包：`sbt distZip`
 + 生成文件`target/universal/[orgination]-[name]-[version].zip`
 
 #### 运行

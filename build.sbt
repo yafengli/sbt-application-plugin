@@ -3,13 +3,13 @@ import Build._
 licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
 
 lazy val root = (project in file(".")).settings(
-    organization := "greatbit",
+    organization := "org.koala",
     name := "sbt-application-plugin",    
     version := $("prod"),
     sbtPlugin := true,
     scalaVersion := $("scala"),
-    sbtVersion in Global := "1.0.3",
-    crossSbtVersions := Seq("0.13.16","1.0.3"),
+    sbtVersion in Global := "1.0.4",
+    crossSbtVersions := Seq("0.13.16","1.0.4"),
     publishMavenStyle := false,
     bintrayRepository := "maven",
     bintrayOrganization in bintray := None,
