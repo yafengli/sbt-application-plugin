@@ -48,7 +48,7 @@ object SbtDistApp extends AutoPlugin {
         if (mc.isDefined) {
           val libs = map.values.map(f => f.name)
           map += SbtDistAppShell.windows(out / s"${suffix}.bat", libs, mc.get)
-          map += SbtDistAppShell.linux(out / s"${suffix}", libs, mc.get)
+          map += SbtDistAppShell.linux(out / s"${suffix}.sh", libs, mc.get)
         }
 
         //copy dirSetting files.
