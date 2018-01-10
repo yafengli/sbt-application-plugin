@@ -1,11 +1,17 @@
 @echo off
 
-if "%JAVA_OPTS%" == "" echo "JAVA_OPTS not set. eg.[SET JAVA_OPTS=-server -Dfile.encoding=utf-8]"
+if "%JAVA_HOME%" == "" echo "JAVA_HOME not set. eg.[SET JAVA_HOME=d:\jdk]"
 
-set APP_CP=.;{{libStr}}
+set JAVA_OPTS=
 
-set JAVA_HOME=%JAVA_HOME%
-set PATH=%JAVA_HOME%/bin;%PATH%
-set CLASSPATH=%APP_CP%
+set "APP_HOME=%~dp0\\.."
 
-java %JAVA_OPTS% {{mainClass}} %*
+cd %APP_HOME%
+
+set APP_CP=.;%APP_HOME%\conf;%APP_HOME%\lib\*
+
+%JAVA_HOME%\bin\java %JAVA_OPTS% -cp %APP_CP% {{mainClass}} %*
+
+
+
+
