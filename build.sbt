@@ -18,7 +18,7 @@ lazy val root = (project in file(".")).settings(
       "org.scalatest" %% "scalatest" % $("scalatest") % "test",
       "junit" % "junit" % $("junit") % "test") ++ {
       val currentSbtVersion = (sbtVersion in pluginCrossBuild).value
-      if(currentSbtVersion.startsWith("1.0"))
+      if(currentSbtVersion.startsWith("1."))
         Seq("org.scala-lang" % "scala-library" % scalaVersion.value, "org.scala-sbt" %% "scripted-sbt" % sbtVersion.value)
       else Seq()
     }
