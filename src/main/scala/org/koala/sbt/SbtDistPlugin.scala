@@ -5,34 +5,30 @@ import sbt._
 
 import scala.collection._
 
-object Import {
-  val dirSetting = settingKey[Seq[String]]("dirSetting")
-  val distZip = taskKey[Unit]("distZip")
-  val treeDeps = taskKey[Unit]("treeDependencies.")
-  val copyDeps = taskKey[Unit]("copyDependencies.")
-
-  val defaultDirs = mutable.Buffer("lib")
-  val pattern = """^.*[^javadoc|^sources]\.jar$""".r.pattern
-  //x.x.x.jar pattern
-  val filter: File => Boolean = { f => f.exists() && pattern.matcher(f.name).find() }
-}
-
-object SbtDistApp extends AutoPlugin {
-
-  import Import._
-
-  val autoImport = Import
-
-  override def requires = sbt.plugins.JvmPlugin
+object SbtDistPlugin extends AutoPlugin {
+  override def requires = plugins.JvmPlugin
 
   override def trigger = noTrigger
+
+  object autoImport {
+    val dirSetting = settingKey[Seq[String]]("dirSetting")
+    val distZip = taskKey[Unit]("distZip")
+    val treeDeps = taskKey[Unit]("treeDependencies.")
+    val copyDeps = taskKey[Unit]("copyDependencies.")
+
+    val defaultDirs = mutable.Buffer("lib")
+    val pattern = """^.*[^javadoc|^sources]\.jar$""".r.pattern
+    //x.x.x.jar pattern
+    val filter: File => Boolean = { f => f.exists() && pattern.matcher(f.name).find() }
+  }
+
+  import autoImport._
 
   override lazy val projectSettings = Seq(
     exportJars := true,
     dirSetting := defaultDirs,
     distZip := {
       val pv = packageBin.in(Compile).value
-      println(s"pv:${pv.getAbsolutePath}")
       val (out, dr, ds, mc, org, v, suffix) = (crossTarget.value, dependencyClasspath.in(Compile).value, dirSetting.value, mainClass.value, organization.value, version.value, name.value)
       try {
         implicit val map = mutable.HashMap[String, File]()
@@ -47,8 +43,8 @@ object SbtDistApp extends AutoPlugin {
         //run shell
         if (mc.isDefined) {
           val libs = map.values.map(f => f.name)
-          map += SbtDistAppShell.windows(out / s"${suffix}.bat", libs, mc.get)
-          map += SbtDistAppShell.linux(out / s"${suffix}.sh", libs, mc.get)
+          map += TemplateShell.windows(out / s"${suffix}.bat", libs, mc.get)
+          map += TemplateShell.linux(out / s"${suffix}.sh", libs, mc.get)
         }
 
         //copy dirSetting files.

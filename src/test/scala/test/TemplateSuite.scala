@@ -4,7 +4,7 @@ import java.io.PrintWriter
 import java.util
 
 import org.junit.runner.RunWith
-import org.koala.sbt.SbtDistAppShell
+import org.koala.sbt.TemplateShell
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
@@ -23,8 +23,8 @@ class TemplateSuite extends FunSuite with BeforeAndAfter {
 
     val w = new PrintWriter(System.out)
 
-    SbtDistAppShell.mustache(w)("windows.mustache", scopes)
+    TemplateShell.mustache(w)("windows.mustache", scopes)
     println("----------------------------------------------")
-    SbtDistAppShell.mustache(w)("linux.mustache", scopes)
+    TemplateShell.mustache(w)("linux.mustache", scopes)
   }
 }

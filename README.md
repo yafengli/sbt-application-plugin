@@ -13,9 +13,9 @@ Sbt Application Plugin
 
 + 发布到本地`Ivy2 Repository`
 
-        cd sbt-application-plugin
+        cd sbt-dist-plugin
         sbt 
-        > ^ publishLocal     // cross build for sbt(0.13.15+, 1.0.0+)
+        > ^ publishLocal     // cross build for sbt@1.2.8+
 
 + 发布到本地`Maven Repository`
 
@@ -30,11 +30,11 @@ Sbt Application Plugin
 #### 使用
 在使用`SBT`的项目中，修改`project/plugins.sbt`文件中内容：
 
-        addSbtPlugin("org.koala" %% "sbt-application-plugin" % "[x.y.z]")
+        addSbtPlugin("org.koala" %% "sbt-dist" % "[x.y.z]")
 
 在构建脚本`build.sbt`中添加内容:    
 
-        lazy val name = project.in(file(".")).enablePlugins(SbtDistApp)
+        lazy val name = project.in(file(".")).enablePlugins(SbtDist)
                                              .settings(mainClass := Some("[demo.class.name]"))
                                              .settings(dirSetting ++= Seq("conf","bin"))
 
