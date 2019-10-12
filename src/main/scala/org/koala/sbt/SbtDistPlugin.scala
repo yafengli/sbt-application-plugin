@@ -57,7 +57,7 @@ object SbtDistPlugin extends AutoPlugin {
 
         //zip/unzip files
         IO.zip(map.map(e => e._2 -> e._1), dist)
-        IO.unzip(dist, (out / "../universal/stage"))
+        //IO.unzip(dist, (out / "../universal/stage"))
       } catch {
         case e: Exception => e.printStackTrace()
       }
