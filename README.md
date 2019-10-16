@@ -22,7 +22,7 @@ Sbt Application Plugin
         sbt 
         > ^ publishM2
         
-+ 特定仓库发布，修改`build.sbt`:`publishTo := Some(Resolver.file("file",  new File("path/your/m2repo")))`     
++ 特定仓库发布，修改`build.sbt`:`publishTo := Some(Resolver.file("file",  new File("path/your/m2repo")))`
 
         sbt 
         > ^ publish       
@@ -30,11 +30,11 @@ Sbt Application Plugin
 #### 使用
 在使用`SBT`的项目中，修改`project/plugins.sbt`文件中内容：
 
-        addSbtPlugin("org.koala" %% "sbt-dist" % "[x.y.z]")
+        addSbtPlugin("org.koala" %% "sbt-dist" % "2.2.1")
 
 在构建脚本`build.sbt`中添加内容:    
 
-        lazy val name = project.in(file(".")).enablePlugins(SbtDist)
+        lazy val name = project.in(file(".")).enablePlugins(SbtDistPlugin)
                                              .settings(mainClass := Some("[demo.class.name]"))
                                              .settings(dirSetting ++= Seq("conf","bin"))
 
