@@ -2,6 +2,7 @@ target/
 project/project
 .classpath
 .project
+.metals/
 *.iml
 .idea*
 .ensime
