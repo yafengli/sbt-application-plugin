@@ -29,8 +29,7 @@ object SbtDistPlugin extends AutoPlugin {
     exportJars := true,
     dirSetting := defaultDirs,
     distZip := {
-      // val pv = packageBin.in(Compile).value
-      val (out, dr, ds, mc, org, v, suffix) = (crossTarget.value, dependencyClasspath.in(Compile).value, dirSetting.value, mainClass.value, organization.value, version.value, name.value)
+      val (self, out, dr, ds, mc, org, v, suffix) = (packageBin.in(Compile).value, crossTarget.value, dependencyClasspath.in(Compile).value, dirSetting.value, mainClass.value, organization.value, version.value, name.value)
       val dist = out / s"../universal/${org}-${suffix}-${v}.zip"
       try {
         implicit val map = mutable.HashMap[String, File]()
@@ -41,7 +40,7 @@ object SbtDistPlugin extends AutoPlugin {
           case d: File if d.isDirectory => d.getParentFile.listFiles().filter(filter).headOption.foreach(f => inject(map, s"lib/${f.name}", f))
         }
         //package jar
-        out.listFiles().filter(filter).headOption.foreach(f => inject(map, s"lib/${f.name}", f))
+        inject(map, s"lib/${self.name}", self)
         //run shell
         if (mc.isDefined) {
           val libs = map.values.map(f => f.name)
