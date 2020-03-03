@@ -12,7 +12,8 @@ object SbtDistPlugin extends AutoPlugin {
 
   object autoImport {
     val dirSetting = settingKey[Seq[String]]("dirSetting")
-    val distZip = taskKey[Unit]("distZip")
+    val distZip = taskKey[File]("distZip")
+    val stage = taskKey[Unit]("stage")
     val treeDeps = taskKey[Unit]("treeDependencies.")
     val copyDeps = taskKey[Unit]("copyDependencies.")
 
@@ -28,8 +29,9 @@ object SbtDistPlugin extends AutoPlugin {
     exportJars := true,
     dirSetting := defaultDirs,
     distZip := {
-      val pv = packageBin.in(Compile).value
+      // val pv = packageBin.in(Compile).value
       val (out, dr, ds, mc, org, v, suffix) = (crossTarget.value, dependencyClasspath.in(Compile).value, dirSetting.value, mainClass.value, organization.value, version.value, name.value)
+      val dist = out / s"../universal/${org}-${suffix}-${v}.zip"
       try {
         implicit val map = mutable.HashMap[String, File]()
 
@@ -52,15 +54,16 @@ object SbtDistPlugin extends AutoPlugin {
           f =>
             if (f.isDirectory) f.listFiles().foreach(copy(_, f.name)) else if (!map.contains(f.name)) inject(map, path(f.getAbsoluteFile.getParentFile.getName, f), f)
         }
-
-        val dist = (out / s"../universal/${org}-${suffix}-${v}.zip")
-
         //zip/unzip files
         IO.zip(map.map(e => e._2 -> e._1), dist)
-        //IO.unzip(dist, (out / "../universal/stage"))
       } catch {
         case e: Exception => e.printStackTrace()
       }
+      dist
+    },
+    stage := {
+      val (out, dist) = (crossTarget.value, distZip.value)
+      IO.unzip(dist, out / "../universal/stage")
     },
     copyDeps := {
       val (ur, out) = (update.value, crossTarget.value)

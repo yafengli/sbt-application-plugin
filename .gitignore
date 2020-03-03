@@ -1,5 +1,6 @@
 target/
 project/project
+project/.bloop
 .classpath
 .project
 .metals/

@@ -1,0 +1,4 @@
+-Dsbt.override.build.repos=true
+-Dsbt.coursier.home=d:/repositories/.coursier
+-Dsbt.ivy.home=d:/repositories/.ivy2
+-Dfile.encoding=UTF-8
