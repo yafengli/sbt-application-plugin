@@ -4,6 +4,8 @@ project/.bloop
 .classpath
 .project
 .metals/
+.bsp/
+.vscode/
 *.iml
 .idea*
 .ensime
