@@ -51,3 +51,12 @@ Sbt Application Plugin
         unzip [orgination]-[name]-[version].zip
         bin/[name].bat                          //Windows
         chmod 777 bin/[name] && bin/[name]      //Linux
+
+
+#### Change Log
+
+* 2.0.2 upgrade to sbt 1.2.x modify Linux & Window scripts.
+
+* 2.0.1 upgrade to sbt 1.1.0. modify Linux & Window scripts.
+
+* 2.0.0 everything is ok.
