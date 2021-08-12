@@ -2,5 +2,5 @@
 -Dsbt.coursier.home=d:/repositories/.coursier
 -Dsbt.ivy.home=d:/repositories/.ivy2
 -Dfile.encoding=UTF-8
--Dhttp.proxy=127.0.0.1:8989
--Dhttps.proxy=127.0.0.1:8989
+-Dhttp.proxy=127.0.0.1:2014
+-Dhttps.proxy=127.0.0.1:2014
