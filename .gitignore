@@ -1,4 +1,5 @@
 target/
+.bloop/
 project/project
 project/.bloop
 .classpath
